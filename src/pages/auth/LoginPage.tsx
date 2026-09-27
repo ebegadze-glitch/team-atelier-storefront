@@ -2,15 +2,24 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Button from '../../shared/ui/Button'
 import Input from '../../shared/ui/Input'
+import Alert from '../../shared/ui/Alert'
 import PasswordInput from '../../shared/ui/PasswordInput'
 import { loginSchema, type LoginFormData } from './loginSchema'
+import { login } from '../../features/auth/api/authApi'
+import { tokenStorage } from '../../shared/lib/tokenStorage'
+import type { ApiError } from '../../shared/api/apiClient' 
 import './LoginPage.css'
+import { useState } from 'react' 
+import { useNavigate } from 'react-router-dom'
+
 
 function LoginPage() {
+  const [formError, setFormError] = useState('')
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting }, 
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
@@ -30,10 +39,32 @@ function LoginPage() {
 
         <form
           className="login-form"
-          onSubmit={handleSubmit(() => {})}
+ onSubmit={handleSubmit(async (data) => {
+  setFormError('')
+
+  try {
+    const response = await login(data)
+    tokenStorage.set(response.accessToken)
+    navigate('/home')
+  } catch (error) {
+    const apiError = error as ApiError
+
+    if (apiError.code === 'INVALID_CREDENTIALS') {
+      setFormError('არასწორი ელფოსტა ან პაროლი')
+    } else {
+      setFormError(apiError.message || 'დაფიქსირდა შეცდომა. სცადეთ თავიდან.')
+    }
+  }
+})}
+
           noValidate
         >
-          <label htmlFor="email">Email</label>
+  {formError && (
+  <Alert variant="error">
+    {formError}
+  </Alert>
+)}        
+      <label htmlFor="email">Email</label>
 
           <Input
             id="email"
@@ -68,7 +99,9 @@ function LoginPage() {
             </p>
           )}
 
-          <Button type="submit">Continue</Button>
+         <Button type="submit" disabled={isSubmitting}>
+  {isSubmitting ? 'Signing in...' : 'Continue'}
+</Button>  
         </form>
 
         <a className="login-link" href="/forgot-password">

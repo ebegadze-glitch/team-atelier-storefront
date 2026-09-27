@@ -1,0 +1,19 @@
+.alert {
+  width: 100%;
+  padding: var(--space-12);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.alert--error {
+  color: var(--error-text);
+  background: var(--background-subtle); 
+  border: 1px solid var(--error-border);
+}
+
+.alert--success {
+  color: var(--text-primary);
+  background: var(--background-subtle);
+  border: 1px solid var(--border-default);
+}

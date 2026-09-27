@@ -1,57 +1,87 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+
 import Button from '../../shared/ui/Button'
 import Input from '../../shared/ui/Input'
 import PasswordInput from '../../shared/ui/PasswordInput'
+import Alert from '../../shared/ui/Alert'
+
 import {
   registerSchema,
   type RegisterFormData,
 } from './registerSchema'
+
+import { register as registerUser } from '../../features/auth/api/authApi'
+import { tokenStorage } from '../../shared/lib/tokenStorage'
+import type { ApiError } from '../../shared/api/apiClient'
+
 import './RegisterPage.css'
 
 function RegisterPage() {
+  const navigate = useNavigate()
+  const [formError, setFormError] = useState('')
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   })
 
   return (
     <main className="register-page">
-      <section
-        className="register-card"
-        aria-labelledby="register-title"
-      >
+      <section className="register-card">
         <p className="register-brand">ATELIER</p>
 
-        <h1 className="register-title" id="register-title">
-          Create your account
-        </h1>
+        <h1>Create account</h1>
 
-        <p className="register-subtitle">
-          Join Atelier and start discovering art.
-        </p>
+        <p>Create your Atelier account.</p>
 
         <form
           className="register-form"
-          onSubmit={handleSubmit(() => {})}
+          onSubmit={handleSubmit(async (data) => {
+            setFormError('')
+
+            try {
+              const response = await registerUser({
+                name: data.name,
+                email: data.email,
+                password: data.password,
+              })
+
+              tokenStorage.set(response.accessToken)
+              navigate('/home')
+            } catch (error) {
+              const apiError = error as ApiError
+
+              setFormError(
+                apiError.message ||
+                  'Registration failed. Please try again.'
+              )
+            }
+          })}
           noValidate
         >
+          {formError && (
+            <Alert variant="error">
+              {formError}
+            </Alert>
+          )}
+
           <label htmlFor="name">Name</label>
 
           <Input
             id="name"
-            type="text"
             autoComplete="name"
             aria-invalid={Boolean(errors.name)}
-            aria-describedby={errors.name ? 'name-error' : undefined}
             {...register('name')}
           />
 
           {errors.name && (
-            <p className="register-error" id="name-error">
+            <p className="register-error">
               {errors.name.message}
             </p>
           )}
@@ -63,12 +93,11 @@ function RegisterPage() {
             type="email"
             autoComplete="email"
             aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? 'email-error' : undefined}
             {...register('email')}
           />
 
           {errors.email && (
-            <p className="register-error" id="email-error">
+            <p className="register-error">
               {errors.email.message}
             </p>
           )}
@@ -79,14 +108,11 @@ function RegisterPage() {
             id="password"
             autoComplete="new-password"
             aria-invalid={Boolean(errors.password)}
-            aria-describedby={
-              errors.password ? 'password-error' : undefined
-            }
             {...register('password')}
           />
 
           {errors.password && (
-            <p className="register-error" id="password-error">
+            <p className="register-error">
               {errors.password.message}
             </p>
           )}
@@ -99,30 +125,25 @@ function RegisterPage() {
             id="confirmPassword"
             autoComplete="new-password"
             aria-invalid={Boolean(errors.confirmPassword)}
-            aria-describedby={
-              errors.confirmPassword
-                ? 'confirm-password-error'
-                : undefined
-            }
             {...register('confirmPassword')}
           />
 
           {errors.confirmPassword && (
-            <p
-              className="register-error"
-              id="confirm-password-error"
-            >
+            <p className="register-error">
               {errors.confirmPassword.message}
             </p>
           )}
 
-          <Button type="submit">
-            Create account
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? 'Creating account...'
+              : 'Create account'}
           </Button>
         </form>
 
         <p className="register-login">
-          Already have an account? <a href="/login">Sign in</a>
+          Already have an account?{' '}
+          <a href="/login">Sign in</a>
         </p>
       </section>
     </main>
