@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from 'react-router-dom'
+
 import Button from '../../shared/ui/Button'
+import FormField from '../../shared/ui/FormField'
 import Input from '../../shared/ui/Input'
+
 import {
   forgotPasswordSchema,
   type ForgotPasswordFormData,
 } from './forgotPasswordSchema'
+
 import './ForgotPasswordPage.css'
 
 function ForgotPasswordPage() {
@@ -15,18 +20,23 @@ function ForgotPasswordPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
   })
 
-  const onSubmit = () => {
+  const onSubmit = async (values: ForgotPasswordFormData) => {
+    await new Promise((resolve) => setTimeout(resolve, 800))
+    console.log(values)
     setSubmitted(true)
   }
 
   return (
     <main className="forgot-page">
-      <section className="forgot-card" aria-labelledby="forgot-title">
+      <section
+        className="forgot-card"
+        aria-labelledby="forgot-title"
+      >
         <p className="forgot-brand">ATELIER</p>
 
         <h1 className="forgot-title" id="forgot-title">
@@ -39,7 +49,7 @@ function ForgotPasswordPage() {
 
         {submitted ? (
           <div className="forgot-success" role="status">
-            Check your inbox for password reset instructions.
+            If an account exists for this email, we've sent a reset link.
           </div>
         ) : (
           <form
@@ -47,30 +57,33 @@ function ForgotPasswordPage() {
             onSubmit={handleSubmit(onSubmit)}
             noValidate
           >
-            <label htmlFor="email">Email</label>
+            <FormField
+              label="Email"
+              htmlFor="email"
+              error={errors.email?.message}
+              errorId="email-error"
+            >
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={
+                  errors.email ? 'email-error' : undefined
+                }
+                {...register('email')}
+              />
+            </FormField>
 
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? 'email-error' : undefined}
-              {...register('email')}
-            />
-
-            {errors.email && (
-              <p className="forgot-error" id="email-error">
-                {errors.email.message}
-              </p>
-            )}
-
-            <Button type="submit">Send reset link</Button>
+            <Button type="submit" isLoading={isSubmitting}>
+              Send reset link
+            </Button>
           </form>
         )}
 
-        <a className="forgot-back" href="/login">
+        <Link className="forgot-back" to="/login">
           Back to login
-        </a>
+        </Link>
       </section>
     </main>
   )

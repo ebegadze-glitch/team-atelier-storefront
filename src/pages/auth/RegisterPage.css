@@ -37,18 +37,6 @@
   gap: var(--space-16);
 }
 
-.register-form label {
-  font-size: var(--font-size-label);
-  font-weight: 500;
-}
-
-.register-error {
-  margin: calc(var(--space-8) * -1) 0 0;
-  color: var(--error-text);
-  font-size: var(--font-size-caption);
-  line-height: var(--line-height-caption);
-}
-
 .register-login {
   margin-top: var(--space-32);
   color: var(--text-secondary);
