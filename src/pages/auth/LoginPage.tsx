@@ -1,19 +1,29 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from 'react-router-dom'
+
 import Button from '../../shared/ui/Button'
+import FormField from '../../shared/ui/FormField'
 import Input from '../../shared/ui/Input'
 import PasswordInput from '../../shared/ui/PasswordInput'
+
 import { loginSchema, type LoginFormData } from './loginSchema'
+
 import './LoginPage.css'
 
 function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
+
+  const onSubmit = async (values: LoginFormData) => {
+    await new Promise((resolve) => setTimeout(resolve, 800))
+    console.log(values)
+  }
 
   return (
     <main className="login-page">
@@ -30,57 +40,62 @@ function LoginPage() {
 
         <form
           className="login-form"
-          onSubmit={handleSubmit(() => {})}
+          onSubmit={handleSubmit(onSubmit)}
           noValidate
         >
-          <label htmlFor="email">Email</label>
+          <FormField
+            label="Email"
+            htmlFor="email"
+            error={errors.email?.message}
+            errorId="email-error"
+          >
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={
+                errors.email ? 'email-error' : undefined
+              }
+              {...register('email')}
+            />
+          </FormField>
 
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? 'email-error' : undefined}
-            {...register('email')}
-          />
+          <FormField
+            label="Password"
+            htmlFor="password"
+            error={errors.password?.message}
+            errorId="password-error"
+          >
+            <PasswordInput
+              id="password"
+              autoComplete="current-password"
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={
+                errors.password ? 'password-error' : undefined
+              }
+              {...register('password')}
+            />
+          </FormField>
 
-          {errors.email && (
-            <p className="login-error" id="email-error">
-              {errors.email.message}
-            </p>
-          )}
-
-          <label htmlFor="password">Password</label>
-
-          <PasswordInput
-            id="password"
-            autoComplete="current-password"
-            aria-invalid={Boolean(errors.password)}
-            aria-describedby={
-              errors.password ? 'password-error' : undefined
-            }
-            {...register('password')}
-          />
-
-          {errors.password && (
-            <p className="login-error" id="password-error">
-              {errors.password.message}
-            </p>
-          )}
-
-          <Button type="submit">Continue</Button>
+          <Button type="submit" isLoading={isSubmitting}>
+            Continue
+          </Button>
         </form>
 
-        <a className="login-link" href="/forgot-password">
+        <Link className="login-link" to="/forgot-password">
           Forgot password?
-        </a>
+        </Link>
 
         <p className="login-register">
-          New to Atelier? <a href="/register">Create account</a>
+          New to Atelier?{' '}
+          <Link to="/register">
+            Create account
+          </Link>
         </p>
       </section>
     </main>
   )
 }
 
-export default LoginPage 
+export default LoginPage
