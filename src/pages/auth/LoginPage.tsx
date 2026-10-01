@@ -1,19 +1,93 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
 import Button from '../../shared/ui/Button'
+import FormField from '../../shared/ui/FormField'
 import Input from '../../shared/ui/Input'
 import PasswordInput from '../../shared/ui/PasswordInput'
+import Alert from '../../shared/ui/Alert'
+
+import {
+  getMe,
+  login,
+} from '../../features/auth/api/authApi'
+import { tokenStorage } from '../../features/auth/model/tokenStorage'
+import { useAuth } from '../../features/auth/model/useAuth'
+import type { ApiError } from '../../shared/api/apiClient'
+
 import { loginSchema, type LoginFormData } from './loginSchema'
+
 import './LoginPage.css'
 
+type LoginLocationState = {
+  from?: {
+    pathname?: string
+  }
+}
+
+function isApiError(error: unknown): error is ApiError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    'message' in error
+  )
+}
+
 function LoginPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { setAuthenticatedUser } = useAuth()
+
+  const [formError, setFormError] = useState<string | null>(null)
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
+
+  const onSubmit = async (values: LoginFormData) => {
+    setFormError(null)
+
+    try {
+      const authData = await login(values)
+
+      tokenStorage.set(authData.accessToken)
+
+      const userData = await getMe()
+
+      setAuthenticatedUser(userData.user)
+
+      const state = location.state as LoginLocationState | null
+      const destination = state?.from?.pathname ?? '/home'
+
+      navigate(destination, { replace: true })
+    } catch (error: unknown) {
+      tokenStorage.remove()
+
+      if (!isApiError(error)) {
+        setFormError('Something went wrong. Please try again.')
+        return
+      }
+
+      if (error.code === 'INVALID_CREDENTIALS') {
+        setFormError('Incorrect email or password.')
+        return
+      }
+
+      if (error.code === 'NETWORK_ERROR') {
+        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        return
+      }
+
+      setFormError(error.message)
+    }
+  }
 
   return (
     <main className="login-page">
@@ -28,59 +102,76 @@ function LoginPage() {
           Sign in to continue to Atelier.
         </p>
 
+        {formError && (
+          <Alert variant="error">
+            {formError}
+          </Alert>
+        )}
+
         <form
           className="login-form"
-          onSubmit={handleSubmit(() => {})}
+          onSubmit={handleSubmit(onSubmit)}
           noValidate
         >
-          <label htmlFor="email">Email</label>
+          <FormField
+            label="Email"
+            htmlFor="email"
+            error={errors.email?.message}
+            errorId="email-error"
+          >
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              disabled={isSubmitting}
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={
+                errors.email ? 'email-error' : undefined
+              }
+              {...register('email')}
+            />
+          </FormField>
 
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? 'email-error' : undefined}
-            {...register('email')}
-          />
+          <FormField
+            label="Password"
+            htmlFor="password"
+            error={errors.password?.message}
+            errorId="password-error"
+          >
+            <PasswordInput
+              id="password"
+              autoComplete="current-password"
+              disabled={isSubmitting}
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={
+                errors.password ? 'password-error' : undefined
+              }
+              {...register('password')}
+            />
+          </FormField>
 
-          {errors.email && (
-            <p className="login-error" id="email-error">
-              {errors.email.message}
-            </p>
-          )}
-
-          <label htmlFor="password">Password</label>
-
-          <PasswordInput
-            id="password"
-            autoComplete="current-password"
-            aria-invalid={Boolean(errors.password)}
-            aria-describedby={
-              errors.password ? 'password-error' : undefined
-            }
-            {...register('password')}
-          />
-
-          {errors.password && (
-            <p className="login-error" id="password-error">
-              {errors.password.message}
-            </p>
-          )}
-
-          <Button type="submit">Continue</Button>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            disabled={isSubmitting}
+          >
+            Continue
+          </Button>
         </form>
 
-        <a className="login-link" href="/forgot-password">
+        <Link className="login-link" to="/forgot-password">
           Forgot password?
-        </a>
+        </Link>
 
         <p className="login-register">
-          New to Atelier? <a href="/register">Create account</a>
+          New to Atelier?{' '}
+          <Link to="/register">
+            Create account
+          </Link>
         </p>
       </section>
     </main>
   )
 }
 
-export default LoginPage 
+export default LoginPage
