@@ -1,0 +1,272 @@
+.product-details-page {
+  min-height: 100vh;
+  background: #f7f7f5;
+  color: #171717;
+}
+
+.product-details-container {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: 40px 32px 72px;
+}
+
+.product-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 28px;
+  color: #555;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.product-back-link:hover {
+  color: #171717;
+}
+
+.product-details-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(360px, 0.9fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.product-details-media {
+  min-width: 0;
+}
+
+.product-details-image {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid #e1e1dd;
+  border-radius: 22px;
+  background: #ecece8;
+}
+
+.product-details-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-details-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #888;
+}
+
+.product-details-discount {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+
+  padding: 7px 12px;
+
+  border-radius: 999px;
+  background: #171717;
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.product-details-info {
+  padding-top: 8px;
+}
+
+.product-details-brand {
+  margin: 0 0 10px;
+  color: #777;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.product-details-info h1 {
+  margin: 0 0 18px;
+
+  font-size: clamp(
+    32px,
+    4vw,
+    52px
+  );
+
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.product-details-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 26px;
+
+  color: #666;
+  font-size: 15px;
+}
+
+.product-details-price {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-bottom: 22px;
+}
+
+.product-details-price strong {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.product-details-price > span {
+  color: #999;
+  font-size: 18px;
+  text-decoration: line-through;
+}
+
+.product-details-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  border-radius: 999px;
+  padding: 8px 12px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.product-details-stock--available {
+  background: #eaf4ed;
+  color: #277245;
+}
+
+.product-details-stock--unavailable {
+  background: #f8eaea;
+  color: #a13a3a;
+}
+
+.stock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.product-details-divider {
+  height: 1px;
+  margin: 30px 0;
+  background: #dfdfdb;
+}
+
+.product-details-summary h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.product-details-summary p {
+  max-width: 520px;
+  margin: 0;
+
+  color: #666;
+  line-height: 1.7;
+}
+
+.continue-shopping-button,
+.back-to-catalog-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 48px;
+
+  border: 1px solid #171717;
+  border-radius: 10px;
+
+  background: #171717;
+  color: #fff;
+
+  padding: 0 20px;
+
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.continue-shopping-button {
+  margin-top: 32px;
+}
+
+.continue-shopping-button:hover,
+.back-to-catalog-button:hover {
+  background: #fff;
+  color: #171717;
+}
+
+.product-details-state {
+  display: grid;
+  place-items: center;
+  gap: 18px;
+
+  min-height: 420px;
+
+  border: 1px dashed #ccc;
+  border-radius: 20px;
+
+  background: #fff;
+
+  padding: 40px;
+  text-align: center;
+}
+
+.product-details-state p {
+  margin: 0;
+  color: #555;
+}
+
+@media (max-width: 900px) {
+  .product-details-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .product-details-info {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-details-container {
+    padding:
+      24px
+      16px
+      48px;
+  }
+
+  .product-details-layout {
+    gap: 24px;
+  }
+
+  .product-details-image {
+    border-radius: 16px;
+  }
+
+  .product-details-info h1 {
+    font-size: 32px;
+  }
+
+  .product-details-price strong {
+    font-size: 26px;
+  }
+} 
