@@ -1,11 +1,21 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import Button from '../../shared/ui/Button'
 import FormField from '../../shared/ui/FormField'
 import Input from '../../shared/ui/Input'
 import PasswordInput from '../../shared/ui/PasswordInput'
+import Alert from '../../shared/ui/Alert'
+
+import {
+  getMe,
+  register as registerUser,
+} from '../../features/auth/api/authApi'
+import { tokenStorage } from '../../features/auth/model/tokenStorage'
+import { useAuth } from '../../features/auth/model/useAuth'
+import type { ApiError } from '../../shared/api/apiClient'
 
 import {
   registerSchema,
@@ -14,18 +24,85 @@ import {
 
 import './RegisterPage.css'
 
+function isApiError(error: unknown): error is ApiError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    'message' in error
+  )
+}
+
 function RegisterPage() {
+  const navigate = useNavigate()
+  const { setAuthenticatedUser } = useAuth()
+
+  const [formError, setFormError] = useState<string | null>(null)
+
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   })
 
   const onSubmit = async (values: RegisterFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    console.log(values)
+    setFormError(null)
+
+    try {
+      const authData = await registerUser({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      })
+
+      tokenStorage.set(authData.accessToken)
+
+      const userData = await getMe()
+
+      setAuthenticatedUser(userData.user)
+
+      navigate('/home', { replace: true })
+    } catch (error: unknown) {
+      tokenStorage.remove()
+
+      if (!isApiError(error)) {
+        setFormError('Something went wrong. Please try again.')
+        return
+      }
+
+      if (error.code === 'VALIDATION_ERROR') {
+        Object.entries(error.errors ?? {}).forEach(
+          ([field, message]) => {
+            if (
+              field === 'name' ||
+              field === 'email' ||
+              field === 'password' ||
+              field === 'confirmPassword'
+            ) {
+              setError(field, { message })
+            }
+          },
+        )
+        return
+      }
+
+      if (error.code === 'EMAIL_TAKEN') {
+        setError('email', {
+          message: 'ეს ელფოსტა უკვე რეგისტრირებულია',
+        })
+        return
+      }
+
+      if (error.code === 'NETWORK_ERROR') {
+        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        return
+      }
+
+      setFormError(error.message)
+    }
   }
 
   return (
@@ -44,6 +121,12 @@ function RegisterPage() {
           Create your Atelier account.
         </p>
 
+        {formError && (
+          <Alert variant="error">
+            {formError}
+          </Alert>
+        )}
+
         <form
           className="register-form"
           onSubmit={handleSubmit(onSubmit)}
@@ -58,6 +141,7 @@ function RegisterPage() {
             <Input
               id="name"
               autoComplete="name"
+              disabled={isSubmitting}
               aria-invalid={Boolean(errors.name)}
               aria-describedby={
                 errors.name ? 'name-error' : undefined
@@ -76,6 +160,7 @@ function RegisterPage() {
               id="email"
               type="email"
               autoComplete="email"
+              disabled={isSubmitting}
               aria-invalid={Boolean(errors.email)}
               aria-describedby={
                 errors.email ? 'email-error' : undefined
@@ -93,6 +178,7 @@ function RegisterPage() {
             <PasswordInput
               id="password"
               autoComplete="new-password"
+              disabled={isSubmitting}
               aria-invalid={Boolean(errors.password)}
               aria-describedby={
                 errors.password ? 'password-error' : undefined
@@ -110,6 +196,7 @@ function RegisterPage() {
             <PasswordInput
               id="confirmPassword"
               autoComplete="new-password"
+              disabled={isSubmitting}
               aria-invalid={Boolean(errors.confirmPassword)}
               aria-describedby={
                 errors.confirmPassword
@@ -120,7 +207,11 @@ function RegisterPage() {
             />
           </FormField>
 
-          <Button type="submit" isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            disabled={isSubmitting}
+          >
             Create account
           </Button>
         </form>
@@ -134,4 +225,4 @@ function RegisterPage() {
   )
 }
 
-export default RegisterPage 
+export default RegisterPage

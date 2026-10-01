@@ -1,17 +1,48 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import Button from '../../shared/ui/Button'
 import FormField from '../../shared/ui/FormField'
 import Input from '../../shared/ui/Input'
 import PasswordInput from '../../shared/ui/PasswordInput'
+import Alert from '../../shared/ui/Alert'
+
+import {
+  getMe,
+  login,
+} from '../../features/auth/api/authApi'
+import { tokenStorage } from '../../features/auth/model/tokenStorage'
+import { useAuth } from '../../features/auth/model/useAuth'
+import type { ApiError } from '../../shared/api/apiClient'
 
 import { loginSchema, type LoginFormData } from './loginSchema'
 
 import './LoginPage.css'
 
+type LoginLocationState = {
+  from?: {
+    pathname?: string
+  }
+}
+
+function isApiError(error: unknown): error is ApiError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    'message' in error
+  )
+}
+
 function LoginPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { setAuthenticatedUser } = useAuth()
+
+  const [formError, setFormError] = useState<string | null>(null)
+
   const {
     register,
     handleSubmit,
@@ -21,8 +52,41 @@ function LoginPage() {
   })
 
   const onSubmit = async (values: LoginFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    console.log(values)
+    setFormError(null)
+
+    try {
+      const authData = await login(values)
+
+      tokenStorage.set(authData.accessToken)
+
+      const userData = await getMe()
+
+      setAuthenticatedUser(userData.user)
+
+      const state = location.state as LoginLocationState | null
+      const destination = state?.from?.pathname ?? '/home'
+
+      navigate(destination, { replace: true })
+    } catch (error: unknown) {
+      tokenStorage.remove()
+
+      if (!isApiError(error)) {
+        setFormError('Something went wrong. Please try again.')
+        return
+      }
+
+      if (error.code === 'INVALID_CREDENTIALS') {
+        setFormError('Incorrect email or password.')
+        return
+      }
+
+      if (error.code === 'NETWORK_ERROR') {
+        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        return
+      }
+
+      setFormError(error.message)
+    }
   }
 
   return (
@@ -37,6 +101,12 @@ function LoginPage() {
         <p className="login-subtitle">
           Sign in to continue to Atelier.
         </p>
+
+        {formError && (
+          <Alert variant="error">
+            {formError}
+          </Alert>
+        )}
 
         <form
           className="login-form"
@@ -53,6 +123,7 @@ function LoginPage() {
               id="email"
               type="email"
               autoComplete="email"
+              disabled={isSubmitting}
               aria-invalid={Boolean(errors.email)}
               aria-describedby={
                 errors.email ? 'email-error' : undefined
@@ -70,6 +141,7 @@ function LoginPage() {
             <PasswordInput
               id="password"
               autoComplete="current-password"
+              disabled={isSubmitting}
               aria-invalid={Boolean(errors.password)}
               aria-describedby={
                 errors.password ? 'password-error' : undefined
@@ -78,7 +150,11 @@ function LoginPage() {
             />
           </FormField>
 
-          <Button type="submit" isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            disabled={isSubmitting}
+          >
             Continue
           </Button>
         </form>
