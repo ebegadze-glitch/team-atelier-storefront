@@ -628,3 +628,75 @@
     margin-bottom: 8px;
   }
 }
+
+/* FE-005: Catalog navigation */
+
+.catalog-top-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.catalog-top-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.catalog-top-link:hover {
+  border-color: #64748b;
+  background-color: #f8fafc;
+  color: #111827;
+}
+
+.catalog-top-link:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+/* Add to cart inside product cards */
+
+.product-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card-body .add-to-cart {
+  margin-top: auto;
+}
+
+.product-card-body .add-to-cart-button {
+  width: 100%;
+  min-height: 42px;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .catalog-top-nav {
+    gap: 10px;
+  }
+
+  .catalog-top-link {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 13px;
+    text-align: center;
+  }
+}
+

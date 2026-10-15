@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router-dom'
 
@@ -24,27 +24,41 @@ import {
 
 import './ProfilePage.css'
 
+const profileFields = [
+  'name',
+  'email',
+  'currentPassword',
+  'newPassword',
+  'confirmNewPassword',
+] as const
+
 function isApiError(error: unknown): error is ApiError {
   return (
     typeof error === 'object' &&
     error !== null &&
     'code' in error &&
-    'message' in error
+    typeof error.code === 'string' &&
+    'message' in error &&
+    typeof error.message === 'string'
   )
 }
 
 export default function ProfilePage() {
   const { user, setAuthenticatedUser } = useAuth()
 
-  const [formError, setFormError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(
+    null,
+  )
+  const [successMessage, setSuccessMessage] = useState<
+    string | null
+  >(null)
 
   const {
     register,
     handleSubmit,
     setError,
     reset,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -57,8 +71,15 @@ export default function ProfilePage() {
     },
   })
 
+  const [name, email, newPassword] = useWatch({
+    control,
+    name: ['name', 'email', 'newPassword'],
+  })
+
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      return
+    }
 
     reset({
       name: user.name,
@@ -69,21 +90,17 @@ export default function ProfilePage() {
     })
   }, [user, reset])
 
-  const name = watch('name')
-  const email = watch('email')
-  const newPassword = watch('newPassword')
-
   const hasChanges = Boolean(
     user &&
-      (
-        name?.trim() !== user.name ||
+      (name?.trim() !== user.name ||
         email?.trim() !== user.email ||
-        newPassword
-      ),
+        newPassword),
   )
 
-  const onSubmit = async (values: ProfileFormData) => {
-    if (!user || !hasChanges) return
+  async function onSubmit(values: ProfileFormData) {
+    if (!user || !hasChanges) {
+      return
+    }
 
     setFormError(null)
     setSuccessMessage(null)
@@ -127,7 +144,9 @@ export default function ProfilePage() {
       setSuccessMessage('ცვლილებები შენახულია')
     } catch (error: unknown) {
       if (!isApiError(error)) {
-        setFormError('დაფიქსირდა შეცდომა. სცადე ხელახლა.')
+        setFormError(
+          'დაფიქსირდა შეცდომა. სცადე ხელახლა.',
+        )
         return
       }
 
@@ -146,31 +165,27 @@ export default function ProfilePage() {
       }
 
       if (error.code === 'VALIDATION_ERROR') {
-        const fieldNames = [
-          'name',
-          'email',
-          'currentPassword',
-          'newPassword',
-          'confirmNewPassword',
-        ] as const
-
         const serverErrors = error.errors ?? {}
 
-        Object.entries(serverErrors).forEach(([field, message]) => {
-          if (field === '_') {
-            setFormError(message)
-            return
-          }
+        Object.entries(serverErrors).forEach(
+          ([field, message]) => {
+            if (field === '_') {
+              setFormError(message)
+              return
+            }
 
-          if (
-            fieldNames.some((fieldName) => fieldName === field)
-          ) {
-            setError(
-              field as (typeof fieldNames)[number],
-              { message },
+            const isProfileField = profileFields.some(
+              (fieldName) => fieldName === field,
             )
-          }
-        })
+
+            if (isProfileField) {
+              setError(
+                field as (typeof profileFields)[number],
+                { message },
+              )
+            }
+          },
+        )
 
         if (Object.keys(serverErrors).length === 0) {
           setFormError(error.message)
@@ -180,7 +195,9 @@ export default function ProfilePage() {
       }
 
       if (error.code === 'NETWORK_ERROR') {
-        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        setFormError(
+          'ქსელთან დაკავშირება ვერ მოხერხდა.',
+        )
         return
       }
 
@@ -219,7 +236,10 @@ export default function ProfilePage() {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+        >
           <FormField
             label="სახელი"
             htmlFor="profile-name"
@@ -271,7 +291,9 @@ export default function ProfilePage() {
               id="profile-current-password"
               autoComplete="current-password"
               disabled={isSubmitting}
-              aria-invalid={Boolean(errors.currentPassword)}
+              aria-invalid={Boolean(
+                errors.currentPassword,
+              )}
               aria-describedby={
                 errors.currentPassword
                   ? 'profile-current-password-error'
@@ -291,7 +313,9 @@ export default function ProfilePage() {
               id="profile-new-password"
               autoComplete="new-password"
               disabled={isSubmitting}
-              aria-invalid={Boolean(errors.newPassword)}
+              aria-invalid={Boolean(
+                errors.newPassword,
+              )}
               aria-describedby={
                 errors.newPassword
                   ? 'profile-new-password-error'
@@ -311,7 +335,9 @@ export default function ProfilePage() {
               id="profile-confirm-password"
               autoComplete="new-password"
               disabled={isSubmitting}
-              aria-invalid={Boolean(errors.confirmNewPassword)}
+              aria-invalid={Boolean(
+                errors.confirmNewPassword,
+              )}
               aria-describedby={
                 errors.confirmNewPassword
                   ? 'profile-confirm-password-error'
@@ -333,3 +359,4 @@ export default function ProfilePage() {
     </main>
   )
 }
+ 

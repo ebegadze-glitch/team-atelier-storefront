@@ -1,134 +1,155 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+
+import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 
 import {
   getProductBySlug,
   type ProductDetails,
-} from "../../features/catalog/api/catalogApi";
+} from '../../features/catalog/api/catalogApi'
 
-import "./ProductDetailsPage.css";
+import { AddToCartButton } from '../../features/cart/ui/AddToCartButton'
 
-// Format specification values
-function formatSpecValue(value: string | number | boolean) {
-  if (typeof value === "boolean") {
-    return value ? "დიახ" : "არა";
+import './ProductDetailsPage.css'
+
+function formatSpecValue(
+  value: string | number | boolean,
+): string {
+  if (typeof value === 'boolean') {
+    return value ? 'დიახ' : 'არა'
   }
 
-  return String(value);
+  return String(value)
 }
 
-// Product details content
-function ProductContent({ slug }: { slug: string }) {
-  const [product, setProduct] = useState<ProductDetails | null>(null);
+type ProductContentProps = {
+  slug: string
+}
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+function ProductContent({ slug }: ProductContentProps) {
+  const [product, setProduct] = useState<ProductDetails | null>(
+    null,
+  )
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedImage, setSelectedImage] = useState(0)
+  const [retryCount, setRetryCount] = useState(0)
 
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [retryCount, setRetryCount] = useState(0);
-
-  // LOAD PRODUCT
   useEffect(() => {
-    let active = true;
+    let active = true
 
     getProductBySlug(slug)
       .then((data) => {
-        if (!active) return;
+        if (!active) return
 
-        setProduct(data);
-        setError(null);
-        setLoading(false);
+        setProduct(data)
+        setError(null)
+        setLoading(false)
       })
       .catch(() => {
-        if (!active) return;
+        if (!active) return
 
-        setError("პროდუქტი ვერ ჩაიტვირთა");
-        setLoading(false);
-      });
+        setError('პროდუქტი ვერ ჩაიტვირთა')
+        setLoading(false)
+      })
 
     return () => {
-      active = false;
-    };
-  }, [slug, retryCount]);
+      active = false
+    }
+  }, [slug, retryCount])
 
-  // LOADING STATE
   if (loading) {
     return (
       <main className="product-details-page">
         <div className="product-details-container">
-          <div className="product-details-state" role="status">
+          <div
+            className="product-details-state"
+            role="status"
+          >
             <p>პროდუქტი იტვირთება...</p>
           </div>
         </div>
       </main>
-    );
+    )
   }
 
-  // ERROR STATE
   if (error || !product) {
     return (
       <main className="product-details-page">
         <div className="product-details-container">
           <div className="product-details-state">
-            <p role="alert">{error ?? "პროდუქტი ვერ მოიძებნა"}</p>
+            <p role="alert">
+              {error ?? 'პროდუქტი ვერ მოიძებნა'}
+            </p>
 
             <button
               type="button"
               className="back-to-catalog-button"
               onClick={() => {
-                setLoading(true);
-                setError(null);
-                setRetryCount((count) => count + 1);
+                setLoading(true)
+                setError(null)
+                setRetryCount((count) => count + 1)
               }}
             >
               ხელახლა ცდა
             </button>
 
-            <Link className="back-to-catalog-button" to="/catalog">
+            <Link
+              className="back-to-catalog-button"
+              to="/catalog"
+            >
               კატალოგში დაბრუნება
             </Link>
           </div>
         </div>
       </main>
-    );
+    )
   }
 
-  // PRODUCT IMAGES
   const images = Array.from(
     new Set(
       [...(product.images ?? []), product.image].filter(
         (image): image is string =>
-          typeof image === "string" && image.trim().length > 0,
+          typeof image === 'string' &&
+          image.trim().length > 0,
       ),
     ),
-  );
+  )
 
-  const activeImage = images[selectedImage] ?? images[0];
+  const activeImage =
+    images[selectedImage] ?? images[0]
 
-  // SPECIFICATIONS
-  const specifications = Object.entries(product.specs ?? {});
+  const specifications = Object.entries(
+    product.specs ?? {},
+  )
 
-  // RELATED PRODUCTS
-  const relatedProducts = product.related ?? [];
+  const relatedProducts = product.related ?? []
 
   return (
     <main className="product-details-page">
       <div className="product-details-container">
-        <Link className="product-back-link" to="/catalog">
+        <Link
+          className="product-back-link"
+          to="/catalog"
+        >
           ← კატალოგში დაბრუნება
         </Link>
 
         <div className="product-details-layout">
-          {/* IMAGE GALLERY */}
+          {/* Product image gallery */}
           <section
             className="product-details-media"
             aria-label="პროდუქტის ფოტოები"
           >
             <div className="product-details-image">
               {activeImage ? (
-                <img src={activeImage} alt={product.title} />
+                <img
+                  src={activeImage}
+                  alt={product.title}
+                />
               ) : (
-                <div className="product-details-placeholder">ფოტო არ არის</div>
+                <div className="product-details-placeholder">
+                  ფოტო არ არის
+                </div>
               )}
 
               {product.discountPercent ? (
@@ -149,12 +170,16 @@ function ProductContent({ slug }: { slug: string }) {
                     type="button"
                     className={
                       index === selectedImage
-                        ? "product-gallery-thumb product-gallery-thumb--active"
-                        : "product-gallery-thumb"
+                        ? 'product-gallery-thumb product-gallery-thumb--active'
+                        : 'product-gallery-thumb'
                     }
-                    onClick={() => setSelectedImage(index)}
+                    onClick={() => {
+                      setSelectedImage(index)
+                    }}
                     aria-label={`ფოტო ${index + 1}`}
-                    aria-pressed={index === selectedImage}
+                    aria-pressed={
+                      index === selectedImage
+                    }
                   >
                     <img
                       src={image}
@@ -167,69 +192,91 @@ function ProductContent({ slug }: { slug: string }) {
             )}
           </section>
 
-          {/* PRODUCT INFORMATION */}
+          {/* Product information */}
           <section className="product-details-info">
             {product.brand && (
-              <p className="product-details-brand">{product.brand}</p>
+              <p className="product-details-brand">
+                {product.brand}
+              </p>
             )}
 
             <h1>{product.title}</h1>
 
             <div className="product-details-rating">
-              <span>★ {product.rating ?? 0}</span>
+              <span>
+                ★ {product.rating ?? 0}
+              </span>
 
-              <span>({product.reviewsCount ?? 0} შეფასება)</span>
+              <span>
+                ({product.reviewsCount ?? 0} შეფასება)
+              </span>
             </div>
 
             <div className="product-details-price">
-              <strong>{product.price} ₾</strong>
+              <strong>
+                {product.price} ₾
+              </strong>
 
-              {product.oldPrice ? <span>{product.oldPrice} ₾</span> : null}
+              {product.oldPrice ? (
+                <span>
+                  {product.oldPrice} ₾
+                </span>
+              ) : null}
             </div>
 
             <div
               className={
-                product.inStock
-                  ? "product-details-stock product-details-stock--available"
-                  : "product-details-stock product-details-stock--unavailable"
+                product.inStock === true
+                  ? 'product-details-stock product-details-stock--available'
+                  : 'product-details-stock product-details-stock--unavailable'
               }
             >
               <span className="stock-dot" />
 
               {product.inStock === true
-                ? "მარაგშია"
+                ? 'მარაგშია'
                 : product.inStock === false
-                  ? "არ არის მარაგში"
-                  : "მარაგის ინფორმაცია მიუწვდომელია"}
+                  ? 'არ არის მარაგში'
+                  : 'მარაგის ინფორმაცია მიუწვდომელია'}
             </div>
 
-            {/* WARRANTY */}
             {product.warrantyMonths !== undefined &&
               product.warrantyMonths !== null && (
                 <div className="product-details-warranty">
-                  <strong>გარანტია:</strong> {product.warrantyMonths} თვე
+                  <strong>გარანტია:</strong>{' '}
+                  {product.warrantyMonths} თვე
                 </div>
               )}
 
+            {/* Add to cart */}
+            <AddToCartButton
+              key={product.id}
+              productId={product.id}
+              inStock={product.inStock}
+            />
+
             <div className="product-details-divider" />
 
-            {/* DESCRIPTION */}
+            {/* Description */}
             <div className="product-details-summary">
               <h2>პროდუქტის შესახებ</h2>
 
               <p>
                 {product.description?.trim() ||
-                  "პროდუქტის აღწერა არ არის მითითებული."}
+                  'პროდუქტის აღწერა არ არის მითითებული.'}
               </p>
             </div>
 
-            <Link className="continue-shopping-button" to="/catalog">
+            <Link
+              className="continue-shopping-button"
+              to="/catalog"
+            >
               სხვა პროდუქტების ნახვა
             </Link>
           </section>
         </div>
 
-        {/* SPECIFICATIONS TABLE */}
+        {/* Specifications */}
         {specifications.length > 0 && (
           <section className="product-specifications">
             <h2>ტექნიკური მახასიათებლები</h2>
@@ -239,9 +286,13 @@ function ProductContent({ slug }: { slug: string }) {
                 <tbody>
                   {specifications.map(([key, value]) => (
                     <tr key={key}>
-                      <th scope="row">{key}</th>
+                      <th scope="row">
+                        {key}
+                      </th>
 
-                      <td>{formatSpecValue(value)}</td>
+                      <td>
+                        {formatSpecValue(value)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -250,7 +301,7 @@ function ProductContent({ slug }: { slug: string }) {
           </section>
         )}
 
-        {/* RELATED PRODUCTS */}
+        {/* Related products */}
         {relatedProducts.length > 0 && (
           <section className="related-products">
             <h2>მსგავსი პროდუქტები</h2>
@@ -293,10 +344,14 @@ function ProductContent({ slug }: { slug: string }) {
                     </Link>
 
                     <div className="related-product-price">
-                      <strong>{relatedProduct.price} ₾</strong>
+                      <strong>
+                        {relatedProduct.price} ₾
+                      </strong>
 
                       {relatedProduct.oldPrice ? (
-                        <span>{relatedProduct.oldPrice} ₾</span>
+                        <span>
+                          {relatedProduct.oldPrice} ₾
+                        </span>
                       ) : null}
                     </div>
 
@@ -313,12 +368,11 @@ function ProductContent({ slug }: { slug: string }) {
         )}
       </div>
     </main>
-  );
+  )
 }
 
-// Route component
 function ProductDetailsPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams<{ slug: string }>()
 
   if (!slug) {
     return (
@@ -327,16 +381,25 @@ function ProductDetailsPage() {
           <div className="product-details-state">
             <p>პროდუქტის მისამართი არასწორია</p>
 
-            <Link className="back-to-catalog-button" to="/catalog">
+            <Link
+              className="back-to-catalog-button"
+              to="/catalog"
+            >
               კატალოგში დაბრუნება
             </Link>
           </div>
         </div>
       </main>
-    );
+    )
   }
 
-  return <ProductContent key={slug} slug={slug} />;
+  return (
+    <ProductContent
+      key={slug}
+      slug={slug}
+    />
+  )
 }
 
-export default ProductDetailsPage;
+export default ProductDetailsPage
+

@@ -1,7 +1,12 @@
+
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 
 import Button from '../../shared/ui/Button'
 import FormField from '../../shared/ui/FormField'
@@ -17,13 +22,18 @@ import { tokenStorage } from '../../features/auth/model/tokenStorage'
 import { useAuth } from '../../features/auth/model/useAuth'
 import type { ApiError } from '../../shared/api/apiClient'
 
-import { loginSchema, type LoginFormData } from './loginSchema'
+import {
+  loginSchema,
+  type LoginFormData,
+} from './loginSchema'
 
 import './LoginPage.css'
 
 type LoginLocationState = {
   from?: {
     pathname?: string
+    search?: string
+    hash?: string
   }
 }
 
@@ -32,21 +42,67 @@ function isApiError(error: unknown): error is ApiError {
     typeof error === 'object' &&
     error !== null &&
     'code' in error &&
-    'message' in error
+    typeof error.code === 'string' &&
+    'message' in error &&
+    typeof error.message === 'string'
   )
+}
+
+function getReturnDestination(
+  state: unknown,
+): string {
+  if (
+    typeof state !== 'object' ||
+    state === null ||
+    !('from' in state)
+  ) {
+    return '/home'
+  }
+
+  const from = (state as LoginLocationState).from
+  const pathname = from?.pathname
+
+  if (
+    typeof pathname !== 'string' ||
+    !pathname.startsWith('/') ||
+    pathname.startsWith('//') ||
+    pathname === '/login'
+  ) {
+    return '/home'
+  }
+
+  const search =
+    typeof from?.search === 'string' &&
+    from.search.startsWith('?')
+      ? from.search
+      : ''
+
+  const hash =
+    typeof from?.hash === 'string' &&
+    from.hash.startsWith('#')
+      ? from.hash
+      : ''
+
+  return `${pathname}${search}${hash}`
 }
 
 function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
+
   const { setAuthenticatedUser } = useAuth()
 
-  const [formError, setFormError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(
+    null,
+  )
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: {
+      errors,
+      isSubmitting,
+    },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
@@ -61,17 +117,22 @@ function LoginPage() {
 
       const userData = await getMe()
 
+      const destination = getReturnDestination(
+        location.state,
+      )
+
       setAuthenticatedUser(userData.user)
 
-      const state = location.state as LoginLocationState | null
-      const destination = state?.from?.pathname ?? '/home'
-
-      navigate(destination, { replace: true })
+      navigate(destination, {
+        replace: true,
+      })
     } catch (error: unknown) {
       tokenStorage.remove()
 
       if (!isApiError(error)) {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(
+          'Something went wrong. Please try again.',
+        )
         return
       }
 
@@ -81,7 +142,9 @@ function LoginPage() {
       }
 
       if (error.code === 'NETWORK_ERROR') {
-        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        setFormError(
+          'ქსელთან დაკავშირება ვერ მოხერხდა.',
+        )
         return
       }
 
@@ -91,10 +154,18 @@ function LoginPage() {
 
   return (
     <main className="login-page">
-      <section className="login-card" aria-labelledby="login-title">
-        <p className="login-brand">ATELIER</p>
+      <section
+        className="login-card"
+        aria-labelledby="login-title"
+      >
+        <p className="login-brand">
+          ATELIER
+        </p>
 
-        <h1 className="login-title" id="login-title">
+        <h1
+          className="login-title"
+          id="login-title"
+        >
           Welcome back
         </h1>
 
@@ -126,7 +197,9 @@ function LoginPage() {
               disabled={isSubmitting}
               aria-invalid={Boolean(errors.email)}
               aria-describedby={
-                errors.email ? 'email-error' : undefined
+                errors.email
+                  ? 'email-error'
+                  : undefined
               }
               {...register('email')}
             />
@@ -144,7 +217,9 @@ function LoginPage() {
               disabled={isSubmitting}
               aria-invalid={Boolean(errors.password)}
               aria-describedby={
-                errors.password ? 'password-error' : undefined
+                errors.password
+                  ? 'password-error'
+                  : undefined
               }
               {...register('password')}
             />
@@ -159,7 +234,10 @@ function LoginPage() {
           </Button>
         </form>
 
-        <Link className="login-link" to="/forgot-password">
+        <Link
+          className="login-link"
+          to="/forgot-password"
+        >
           Forgot password?
         </Link>
 
@@ -175,3 +253,4 @@ function LoginPage() {
 }
 
 export default LoginPage
+
