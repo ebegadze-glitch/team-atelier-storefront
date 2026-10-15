@@ -1,6 +1,9 @@
 
 import { Link } from 'react-router-dom'
+
 import { useAuth } from '../features/auth/model/useAuth'
+import { useCart } from '../features/cart/model/useCart'
+
 import './HomePage.css'
 
 const featuredBrands = [
@@ -27,18 +30,27 @@ const featuredBrands = [
 export default function HomePage() {
   const { user, logout } = useAuth()
 
+  const { cart, isLoading: isCartLoading } = useCart()
+
   const displayName =
     user?.name?.trim() ||
     user?.email?.split('@')[0] ||
     'User'
 
-  const userInitial = displayName.charAt(0).toUpperCase()
+  const userInitial = displayName
+    .charAt(0)
+    .toUpperCase()
+
+  const cartQuantity = cart?.totalQty ?? 0
 
   return (
     <main className="home-page">
       <div className="home-container">
         <header className="home-header">
-          <Link className="home-brand" to="/home">
+          <Link
+            className="home-brand"
+            to="/home"
+          >
             ATELIER
           </Link>
 
@@ -60,28 +72,49 @@ export default function HomePage() {
               aria-label="Wishlist — coming soon"
               disabled
             >
-              <span className="home-icon" aria-hidden="true">
+              <span
+                className="home-icon"
+                aria-hidden="true"
+              >
                 ♡
               </span>
+
               <span className="home-icon-label">
                 Wishlist
               </span>
             </button>
 
-            <button
-              type="button"
+            {/* Shopping cart */}
+            <Link
+              to="/cart"
               className="home-icon-button"
-              title="Shopping cart — coming soon"
-              aria-label="Shopping cart — coming soon"
-              disabled
+              aria-label={
+                isCartLoading
+                  ? 'Shopping cart — loading'
+                  : `Shopping cart — ${cartQuantity} items`
+              }
+              title="View shopping cart"
             >
-              <span className="home-icon" aria-hidden="true">
+              <span
+                className="home-icon"
+                aria-hidden="true"
+              >
                 🛍
               </span>
+
               <span className="home-icon-label">
                 Cart
               </span>
-            </button>
+
+              {!isCartLoading && cartQuantity > 0 && (
+                <span
+                  className="home-cart-badge"
+                  aria-hidden="true"
+                >
+                  {cartQuantity}
+                </span>
+              )}
+            </Link>
 
             <div className="home-user-menu">
               <div
@@ -92,8 +125,13 @@ export default function HomePage() {
               </div>
 
               <div className="home-user-data">
-                <strong>{displayName}</strong>
-                <span>{user?.email}</span>
+                <strong>
+                  {displayName}
+                </strong>
+
+                <span>
+                  {user?.email}
+                </span>
               </div>
             </div>
 
@@ -114,6 +152,7 @@ export default function HomePage() {
           </nav>
         </header>
 
+        {/* Hero */}
         <section className="home-hero">
           <div className="home-hero-content">
             <p className="home-eyebrow">
@@ -122,7 +161,9 @@ export default function HomePage() {
 
             <h1 className="home-title">
               ავეჯი თანამედროვე
-              <span>ცხოვრებისთვის</span>
+              <span>
+                ცხოვრებისთვის
+              </span>
             </h1>
 
             <p className="home-description">
@@ -171,9 +212,13 @@ export default function HomePage() {
             </div>
 
             <div className="home-mini-user">
-              <strong>{displayName}</strong>
+              <strong>
+                {displayName}
+              </strong>
+
               <span>
-                {user?.email ?? 'Email unavailable'}
+                {user?.email ??
+                  'Email unavailable'}
               </span>
             </div>
 
@@ -186,6 +231,7 @@ export default function HomePage() {
           </aside>
         </section>
 
+        {/* Featured brands */}
         <section className="home-brands-section">
           <div className="home-section-heading">
             <div>
@@ -193,7 +239,9 @@ export default function HomePage() {
                 FEATURED BRANDS
               </p>
 
-              <h2>აღმოაჩინე წამყვანი ბრენდები</h2>
+              <h2>
+                აღმოაჩინე წამყვანი ბრენდები
+              </h2>
             </div>
 
             <Link
@@ -230,8 +278,13 @@ export default function HomePage() {
                     </span>
 
                     <div>
-                      <p>{brand.description}</p>
-                      <h3>{brand.name}</h3>
+                      <p>
+                        {brand.description}
+                      </p>
+
+                      <h3>
+                        {brand.name}
+                      </h3>
 
                       <span className="home-shop-now">
                         კოლექციის ნახვა →
@@ -244,9 +297,13 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Footer */}
         <footer className="home-footer">
           <div className="home-footer-brand">
-            <strong>ATELIER</strong>
+            <strong>
+              ATELIER
+            </strong>
+
             <p>
               Furniture for thoughtful interiors.
             </p>
@@ -256,8 +313,14 @@ export default function HomePage() {
             <span>
               18 Atelier Street, Tbilisi, Georgia
             </span>
-            <span>+995 32 2 45 67 89</span>
-            <span>hello@atelier.ge</span>
+
+            <span>
+              +995 32 2 45 67 89
+            </span>
+
+            <span>
+              hello@atelier.ge
+            </span>
           </div>
 
           <div className="home-socials">
@@ -297,6 +360,7 @@ export default function HomePage() {
           <span>
             © 2026 Atelier. All rights reserved.
           </span>
+
           <span>
             Designed for modern living.
           </span>
@@ -305,3 +369,4 @@ export default function HomePage() {
     </main>
   )
 }
+
