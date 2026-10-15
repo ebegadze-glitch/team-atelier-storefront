@@ -57,4 +57,3 @@ export function deleteAddress(id: string) {
     },
   )
 }
-

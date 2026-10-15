@@ -1,199 +1,231 @@
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import {
-  createAddress,
-  getAddresses,
-  type Address,
-  type AddressInput,
+import type {
+  Address,
+  AddressInput,
+  UpdateAddressInput,
 } from '../../features/addresses/api/addressesApi'
-
-import AddressForm from '../../features/addresses/ui/AddressForm'
 import type { AddressFormData } from '../../features/addresses/model/addressSchema'
-import type { ApiError } from '../../shared/api/apiClient'
+import { useAddresses } from '../../features/addresses/model/useAddresses'
+import AddressCard from '../../features/addresses/ui/AddressCard'
+import AddressForm from '../../features/addresses/ui/AddressForm'
 
 import Alert from '../../shared/ui/Alert'
 import Button from '../../shared/ui/Button'
+import './AddressesPage.css'
 
-function isApiError(error: unknown): error is ApiError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error
-  )
+type FormMode =
+  | { type: 'closed' }
+  | { type: 'create' }
+  | { type: 'edit'; address: Address }
+
+function toAddressInput(values: AddressFormData): AddressInput {
+  return {
+    label: values.label.trim() || null,
+    fullName: values.fullName.trim(),
+    phone: values.phone.trim(),
+    city: values.city.trim(),
+    address: values.address.trim(),
+    isDefault: values.isDefault,
+  }
+}
+
+function getAddressChanges(
+  original: Address,
+  input: AddressInput,
+): UpdateAddressInput {
+  const changes: UpdateAddressInput = {}
+
+  if (input.label !== original.label) {
+    changes.label = input.label
+  }
+
+  if (input.fullName !== original.fullName) {
+    changes.fullName = input.fullName
+  }
+
+  if (input.phone !== original.phone) {
+    changes.phone = input.phone
+  }
+
+  if (input.city !== original.city) {
+    changes.city = input.city
+  }
+
+  if (input.address !== original.address) {
+    changes.address = input.address
+  }
+
+  // API accepts promotion, not explicit removal of default.
+  if (input.isDefault && !original.isDefault) {
+    changes.isDefault = true
+  }
+
+  return changes
+}
+
+function toFormValues(address: Address): AddressFormData {
+  return {
+    label: address.label ?? '',
+    fullName: address.fullName,
+    phone: address.phone,
+    city: address.city,
+    address: address.address,
+    isDefault: address.isDefault,
+  }
 }
 
 export default function AddressesPage() {
-  const [addresses, setAddresses] = useState<Address[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const {
+    addresses,
+    isLoading,
+    isMutating,
+    error,
+    success,
+    clearMessages,
+    addAddress,
+    editAddress,
+    setDefaultAddress,
+    removeAddress,
+  } = useAddresses()
 
-  const loadAddresses = useCallback(async () => {
-    const response = await getAddresses()
-    setAddresses(response.items)
-  }, [])
+  const [formMode, setFormMode] = useState<FormMode>({
+    type: 'closed',
+  })
 
-  useEffect(() => {
-    let active = true
+  const formOpen = formMode.type !== 'closed'
 
-    async function loadInitialAddresses() {
-      try {
-        const response = await getAddresses()
+  async function handleSave(values: AddressFormData) {
+    if (formMode.type === 'closed') return
 
-        if (active) {
-          setAddresses(response.items)
-        }
-      } catch {
-        if (active) {
-          setError('მისამართების ჩატვირთვა ვერ მოხერხდა.')
-        }
-      } finally {
-        if (active) {
-          setIsLoading(false)
-        }
+    const input = toAddressInput(values)
+
+    if (formMode.type === 'create') {
+      const saved = await addAddress(input)
+
+      if (saved) {
+        setFormMode({ type: 'closed' })
       }
+
+      return
     }
 
-    void loadInitialAddresses()
+    const changes = getAddressChanges(formMode.address, input)
+    const saved = await editAddress(formMode.address.id, changes)
 
-    return () => {
-      active = false
+    if (saved) {
+      setFormMode({ type: 'closed' })
     }
-  }, [])
+  }
 
-  const handleCreate = async (values: AddressFormData) => {
-    setError(null)
-    setSuccessMessage(null)
+  function handleEdit(address: Address) {
+    clearMessages()
+    setFormMode({ type: 'edit', address })
+  }
 
-    const payload: AddressInput = {
-      fullName: values.fullName.trim(),
-      phone: values.phone.trim(),
-      city: values.city.trim(),
-      address: values.address.trim(),
-      isDefault: values.isDefault,
-    }
+  function handleDelete(address: Address) {
+    const confirmed = window.confirm(
+      `ნამდვილად გსურს მისამართის "${address.label || address.city}" წაშლა?`,
+    )
 
-    if (values.label.trim()) {
-      payload.label = values.label.trim()
-    }
+    if (!confirmed) return
 
-    try {
-      await createAddress(payload)
-
-      setShowForm(false)
-
-      await loadAddresses()
-
-      setSuccessMessage('მისამართი წარმატებით დაემატა')
-    } catch (caughtError: unknown) {
-      if (isApiError(caughtError)) {
-        if (caughtError.code === 'ADDRESS_LIMIT_REACHED') {
-          setError('შესაძლებელია მაქსიმუმ 10 მისამართის შენახვა.')
-        } else if (caughtError.code === 'VALIDATION_ERROR') {
-          setError(caughtError.message)
-        } else if (caughtError.code === 'NETWORK_ERROR') {
-          setError('ქსელთან დაკავშირება ვერ მოხერხდა.')
-        } else {
-          setError(caughtError.message)
-        }
-      } else {
-        setError('მისამართის შენახვა ვერ მოხერხდა.')
-      }
-    }
+    void removeAddress(address.id)
   }
 
   return (
     <main className="addresses-page">
       <div className="addresses-container">
-        <Link to="/profile">
+        <Link to="/profile" className="addresses-back">
           ← პროფილზე დაბრუნება
         </Link>
 
-        <h1>ჩემი მისამართები</h1>
+        <header className="addresses-heading">
+          <h1>ჩემი მისამართები</h1>
+          <p>დაამატე და მართე მიწოდების მისამართები.</p>
+        </header>
 
-        <p>მართე მიწოდების მისამართები.</p>
+        {error && <Alert variant="error">{error}</Alert>}
+        {success && <Alert variant="success">{success}</Alert>}
 
-        {error && (
-          <Alert variant="error">
-            {error}
-          </Alert>
-        )}
-
-        {successMessage && (
-          <Alert variant="success">
-            {successMessage}
-          </Alert>
-        )}
-
-        {!isLoading && !showForm && (
+        {!isLoading && !formOpen && (
           <Button
             type="button"
-            disabled={addresses.length >= 10}
+            disabled={addresses.length >= 10 || isMutating}
             onClick={() => {
-              setError(null)
-              setSuccessMessage(null)
-              setShowForm(true)
+              clearMessages()
+              setFormMode({ type: 'create' })
             }}
           >
             + მისამართის დამატება
           </Button>
         )}
 
-        {showForm && (
-          <section aria-label="ახალი მისამართი">
+        {formMode.type === 'create' && (
+          <section className="addresses-form-card">
             <h2>ახალი მისამართი</h2>
 
             <AddressForm
-              onSave={handleCreate}
+              key="create"
+              onSave={handleSave}
               onCancel={() => {
-                setShowForm(false)
-                setError(null)
+                clearMessages()
+                setFormMode({ type: 'closed' })
               }}
             />
           </section>
         )}
 
-        {isLoading && (
-          <p>მისამართები იტვირთება...</p>
+        {formMode.type === 'edit' && (
+          <section className="addresses-form-card">
+            <h2>მისამართის რედაქტირება</h2>
+
+            <AddressForm
+              key={formMode.address.id}
+              initialValues={toFormValues(formMode.address)}
+              onSave={handleSave}
+              onCancel={() => {
+                clearMessages()
+                setFormMode({ type: 'closed' })
+              }}
+            />
+          </section>
         )}
 
-        {!isLoading && !error && addresses.length === 0 && (
-          <p>მისამართები ჯერ არ გაქვს დამატებული.</p>
+        {isLoading && <p>მისამართები იტვირთება...</p>}
+
+        {!isLoading && addresses.length === 0 && (
+          <div className="addresses-empty">
+            <p>მისამართები ჯერ არ გაქვს დამატებული.</p>
+          </div>
         )}
 
         {!isLoading && addresses.length > 0 && (
           <div className="addresses-list">
-            {addresses.map((item) => (
-              <article
-                key={item.id}
-                className="address-card"
-              >
-                <h2>{item.label || 'მისამართი'}</h2>
-
-                {item.isDefault && (
-                  <strong>ძირითადი მისამართი</strong>
-                )}
-
-                <p>მიმღები: {item.fullName}</p>
-                <p>ტელეფონი: {item.phone}</p>
-                <p>ქალაქი: {item.city}</p>
-                <p>მისამართი: {item.address}</p>
-              </article>
+            {addresses.map((address) => (
+              <AddressCard
+                key={address.id}
+                address={address}
+                disabled={isMutating || formOpen}
+                onEdit={handleEdit}
+                onSetDefault={(item) => {
+                  void setDefaultAddress(item.id)
+                }}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
 
         {!isLoading && addresses.length >= 10 && (
-          <p>
-            მიღწეულია მაქსიმალური რაოდენობა — 10 მისამართი.
+          <p className="addresses-limit">
+            შესაძლებელია მაქსიმუმ 10 მისამართის შენახვა.
           </p>
         )}
       </div>
     </main>
   )
 }
-
+ 
