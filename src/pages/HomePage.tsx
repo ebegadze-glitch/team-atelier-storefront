@@ -1,3 +1,5 @@
+
+import { Link } from 'react-router-dom'
 import { useAuth } from '../features/auth/model/useAuth'
 
 export default function HomePage() {
@@ -9,9 +11,19 @@ export default function HomePage() {
 
       <p>{user?.email}</p>
 
-      <button type="button" onClick={logout}>
+      <nav aria-label="Account navigation">
+        <Link to="/profile">
+          My Profile
+        </Link>
+      </nav>
+
+      <button
+        type="button"
+        onClick={logout}
+      >
         Log out
       </button>
     </main>
   )
 }
+
