@@ -13,15 +13,52 @@ type ApiClientOptions = RequestInit & {
   withAuth?: boolean
 }
 
+const INVALID_SESSION_CODES = new Set([
+  'TOKEN_EXPIRED',
+  'INVALID_TOKEN',
+  'UNAUTHORIZED',
+])
 
-function isInvalidSessionError(
-  status: number,
-  code: string,
-): boolean {
+function isAbortError(error: unknown): boolean {
   return (
-    status === 401 &&
-    ['TOKEN_EXPIRED', 'INVALID_TOKEN', 'UNAUTHORIZED'].includes(code)
+    error instanceof DOMException &&
+    error.name === 'AbortError'
   )
+}
+
+function getApiError(data: unknown): ApiError {
+  const body =
+    typeof data === 'object' && data !== null && !Array.isArray(data)
+      ? (data as Record<string, unknown>)
+      : {}
+
+  const apiError: ApiError = {
+    message:
+      typeof body.message === 'string'
+        ? body.message
+        : 'მოთხოვნის შესრულება ვერ მოხერხდა.',
+    code:
+      typeof body.code === 'string'
+        ? body.code
+        : 'UNKNOWN_ERROR',
+  }
+
+  if (
+    typeof body.errors === 'object' &&
+    body.errors !== null &&
+    !Array.isArray(body.errors)
+  ) {
+    const entries = Object.entries(body.errors).filter(
+      (entry): entry is [string, string] =>
+        typeof entry[1] === 'string',
+    )
+
+    if (entries.length > 0) {
+      apiError.errors = Object.fromEntries(entries)
+    }
+  }
+
+  return apiError
 }
 
 export async function apiClient<T>(
@@ -30,11 +67,13 @@ export async function apiClient<T>(
 ): Promise<T> {
   const { withAuth = true, headers, ...requestOptions } = options
 
-  const requestHeaders = new Headers(headers)
   const token = withAuth ? tokenStorage.get() : null
+  const requestHeaders = new Headers(headers)
 
-  if (requestOptions.body != null &&
-      !requestHeaders.has('Content-Type')) {
+  if (
+    requestOptions.body != null &&
+    !requestHeaders.has('Content-Type')
+  ) {
     requestHeaders.set('Content-Type', 'application/json')
   }
 
@@ -49,10 +88,15 @@ export async function apiClient<T>(
       ...requestOptions,
       headers: requestHeaders,
     })
-  } catch {
+  } catch (error: unknown) {
+    // Cancelled requests must stay cancelled.
+    if (isAbortError(error)) {
+      throw error
+    }
+
     throw {
-      code: 'NETWORK_ERROR',
       message: 'ქსელთან დაკავშირება ვერ მოხერხდა.',
+      code: 'NETWORK_ERROR',
     } satisfies ApiError
   }
 
@@ -62,43 +106,20 @@ export async function apiClient<T>(
       : await response.json().catch(() => null)
 
   if (!response.ok) {
-    const body =
-      typeof data === 'object' && data !== null
-        ? data as Record<string, unknown>
-        : {}
-
-    const apiError: ApiError = {
-      message:
-        typeof body.message === 'string'
-          ? body.message
-          : 'მოთხოვნის შესრულება ვერ მოხერხდა.',
-      code:
-        typeof body.code === 'string'
-          ? body.code
-          : 'UNKNOWN_ERROR',
-    }
-
-    if (
-      typeof body.errors === 'object' &&
-      body.errors !== null &&
-      !Array.isArray(body.errors) &&
-      Object.values(body.errors).every(
-        (value) => typeof value === 'string',
-      )
-    ) {
-      apiError.errors = body.errors as Record<string, string>
-    }
+    const apiError = getApiError(data)
 
     if (
       withAuth &&
-      isInvalidSessionError(response.status, apiError.code)
+      response.status === 401 &&
+      INVALID_SESSION_CODES.has(apiError.code) &&
+      token &&
+      tokenStorage.get() === token
     ) {
-      if (token && tokenStorage.get() === token) {
-        tokenStorage.remove()
-        window.dispatchEvent(
-          new CustomEvent('auth:token-expired'),
-        )
-      }
+      tokenStorage.remove()
+
+      window.dispatchEvent(
+        new CustomEvent('auth:token-expired'),
+      )
     }
 
     throw apiError

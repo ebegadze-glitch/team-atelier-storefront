@@ -10,12 +10,19 @@ import {
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+
 import HomePage from './pages/HomePage'
+import CatalogPage from './pages/catalog/CatalogPage'
+import ProductDetailsPage from './pages/product/ProductDetailsPage'
 import ProfilePage from './pages/profile/ProfilePage'
 import AddressesPage from './pages/addresses/AddressesPage'
 
 import { ProtectedRoute } from './features/auth/model/ProtectedRoute'
 import { useAuth } from './features/auth/model/useAuth'
+
+type PublicOnlyRouteProps = {
+  children: ReactNode
+}
 
 function RootRedirect() {
   const { status } = useAuth()
@@ -24,14 +31,15 @@ function RootRedirect() {
     return <p>Loading...</p>
   }
 
-  if (status === 'authenticated') {
-    return <Navigate to="/home" replace />
-  }
-
-  return <Navigate to="/login" replace />
+  return (
+    <Navigate
+      to={status === 'authenticated' ? '/home' : '/login'}
+      replace
+    />
+  )
 }
 
-function PublicOnlyRoute({ children }: { children: ReactNode }) {
+function PublicOnlyRoute({ children }: PublicOnlyRouteProps) {
   const { status } = useAuth()
 
   if (status === 'loading') {
@@ -45,14 +53,12 @@ function PublicOnlyRoute({ children }: { children: ReactNode }) {
   return children
 }
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ROOT */}
         <Route path="/" element={<RootRedirect />} />
 
-        {/* PUBLIC AUTH ROUTES */}
         <Route
           path="/login"
           element={
@@ -80,19 +86,20 @@ function App() {
           }
         />
 
-        {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/addresses" element={<AddressesPage />} />
         </Route>
 
-        {/* UNKNOWN ROUTE */}
+        <Route path="/catalog" element={<CatalogPage />} />
+        <Route
+          path="/product/:slug"
+          element={<ProductDetailsPage />}
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
 }
-
-export default App
-
