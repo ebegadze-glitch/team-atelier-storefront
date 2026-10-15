@@ -85,3 +85,17 @@ export function resetPassword(payload: ResetPasswordPayload) {
     body: JSON.stringify(payload),
   })
 }
+
+export type UpdateMePayload = {
+  currentPassword: string
+  name?: string
+  email?: string
+  newPassword?: string
+}
+
+export function updateMe(payload: UpdateMePayload) {
+  return apiClient<{ user: User }>('/auth/me', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
