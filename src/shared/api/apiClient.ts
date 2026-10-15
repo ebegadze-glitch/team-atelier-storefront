@@ -1,3 +1,4 @@
+
 import { tokenStorage } from '../../features/auth/model/tokenStorage'
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -12,12 +13,14 @@ type ApiClientOptions = RequestInit & {
   withAuth?: boolean
 }
 
-function isApiError(error: unknown): error is ApiError {
+
+function isInvalidSessionError(
+  status: number,
+  code: string,
+): boolean {
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error
+    status === 401 &&
+    ['TOKEN_EXPIRED', 'INVALID_TOKEN', 'UNAUTHORIZED'].includes(code)
   )
 }
 
@@ -27,56 +30,79 @@ export async function apiClient<T>(
 ): Promise<T> {
   const { withAuth = true, headers, ...requestOptions } = options
 
-  const token = tokenStorage.get()
-
   const requestHeaders = new Headers(headers)
+  const token = withAuth ? tokenStorage.get() : null
 
-  requestHeaders.set('Content-Type', 'application/json')
+  if (requestOptions.body != null &&
+      !requestHeaders.has('Content-Type')) {
+    requestHeaders.set('Content-Type', 'application/json')
+  }
 
   if (withAuth && token) {
     requestHeaders.set('Authorization', `Bearer ${token}`)
   }
 
+  let response: Response
+
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    response = await fetch(`${API_URL}${endpoint}`, {
       ...requestOptions,
       headers: requestHeaders,
     })
+  } catch {
+    throw {
+      code: 'NETWORK_ERROR',
+      message: 'ქსელთან დაკავშირება ვერ მოხერხდა.',
+    } satisfies ApiError
+  }
 
-    const data = await response.json().catch(() => null)
+  const data: unknown =
+    response.status === 204
+      ? null
+      : await response.json().catch(() => null)
 
-    if (!response.ok) {
-      const apiError: ApiError = {
-        message: data?.message ?? 'Something went wrong',
-        code: data?.code ?? 'UNKNOWN_ERROR',
-        errors: data?.errors,
-      }
+  if (!response.ok) {
+    const body =
+      typeof data === 'object' && data !== null
+        ? data as Record<string, unknown>
+        : {}
 
-      if (
-        response.status === 401 &&
-        apiError.code === 'TOKEN_EXPIRED'
-      ) {
+    const apiError: ApiError = {
+      message:
+        typeof body.message === 'string'
+          ? body.message
+          : 'მოთხოვნის შესრულება ვერ მოხერხდა.',
+      code:
+        typeof body.code === 'string'
+          ? body.code
+          : 'UNKNOWN_ERROR',
+    }
+
+    if (
+      typeof body.errors === 'object' &&
+      body.errors !== null &&
+      !Array.isArray(body.errors) &&
+      Object.values(body.errors).every(
+        (value) => typeof value === 'string',
+      )
+    ) {
+      apiError.errors = body.errors as Record<string, string>
+    }
+
+    if (
+      withAuth &&
+      isInvalidSessionError(response.status, apiError.code)
+    ) {
+      if (token && tokenStorage.get() === token) {
         tokenStorage.remove()
-
         window.dispatchEvent(
           new CustomEvent('auth:token-expired'),
         )
       }
-
-      throw apiError
     }
 
-    return data as T
-  } catch (error: unknown) {
-    if (isApiError(error)) {
-      throw error
-    }
-
-    const networkError: ApiError = {
-      message: 'ქსელთან დაკავშირება ვერ მოხერხდა',
-      code: 'NETWORK_ERROR',
-    }
-
-    throw networkError
+    throw apiError
   }
+
+  return data as T
 }
