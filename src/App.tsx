@@ -1,5 +1,6 @@
 
 import type { ReactNode } from 'react'
+
 import {
   BrowserRouter,
   Navigate,
@@ -16,6 +17,7 @@ import CatalogPage from './pages/catalog/CatalogPage'
 import ProductDetailsPage from './pages/product/ProductDetailsPage'
 import ProfilePage from './pages/profile/ProfilePage'
 import AddressesPage from './pages/addresses/AddressesPage'
+import CartPage from './pages/cart/CartPage'
 
 import { ProtectedRoute } from './features/auth/model/ProtectedRoute'
 import { useAuth } from './features/auth/model/useAuth'
@@ -39,7 +41,9 @@ function RootRedirect() {
   )
 }
 
-function PublicOnlyRoute({ children }: PublicOnlyRouteProps) {
+function PublicOnlyRoute({
+  children,
+}: PublicOnlyRouteProps) {
   const { status } = useAuth()
 
   if (status === 'loading') {
@@ -57,7 +61,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<RootRedirect />} />
+        <Route
+          path="/"
+          element={<RootRedirect />}
+        />
 
         <Route
           path="/login"
@@ -87,19 +94,45 @@ export default function App() {
         />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/addresses" element={<AddressesPage />} />
+          <Route
+            path="/home"
+            element={<HomePage />}
+          />
+
+          <Route
+            path="/profile"
+            element={<ProfilePage />}
+          />
+
+          <Route
+            path="/addresses"
+            element={<AddressesPage />}
+          />
+
+          <Route
+            path="/cart"
+            element={<CartPage />}
+          />
         </Route>
 
-        <Route path="/catalog" element={<CatalogPage />} />
+        <Route
+          path="/catalog"
+          element={<CatalogPage />}
+        />
+
         <Route
           path="/product/:slug"
           element={<ProductDetailsPage />}
         />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="*"
+          element={
+            <Navigate to="/" replace />
+          }
+        />
       </Routes>
     </BrowserRouter>
   )
 }
+
