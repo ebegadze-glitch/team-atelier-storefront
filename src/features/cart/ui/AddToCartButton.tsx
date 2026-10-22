@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../auth/model/useAuth'
 import { useCart } from '../model/useCart'
+import { cartErrorText } from '../lib/cartErrors'
+import { isApiError } from '../../../shared/api/apiClient'
 import './AddToCartButton.css'
 
 type AddToCartButtonProps = {
@@ -11,39 +13,6 @@ type AddToCartButtonProps = {
   inStock?: boolean
   qty?: number
   className?: string
-}
-
-type CartError = {
-  code?: string
-  message?: string
-  available?: number
-}
-
-function getCartErrorMessage(error: unknown): string {
-  if (typeof error !== 'object' || error === null) {
-    return 'პროდუქტის დამატება ვერ მოხერხდა.'
-  }
-
-  const apiError = error as CartError
-
-  switch (apiError.code) {
-    case 'OUT_OF_STOCK':
-      return 'პროდუქტი ამჟამად არ არის მარაგში.'
-
-    case 'INSUFFICIENT_STOCK':
-      return typeof apiError.available === 'number'
-        ? `მარაგში დარჩენილია მხოლოდ ${apiError.available} ცალი.`
-        : 'მოთხოვნილი რაოდენობა მარაგში არ არის.'
-
-    case 'PRODUCT_NOT_FOUND':
-      return 'პროდუქტი ვერ მოიძებნა.'
-
-    default:
-      return (
-        apiError.message ||
-        'პროდუქტის დამატება ვერ მოხერხდა.'
-      )
-  }
 }
 
 export function AddToCartButton({
@@ -97,12 +66,13 @@ export function AddToCartButton({
       await addItem(productId, qty)
       setMessage('პროდუქტი დაემატა კალათაში.')
     } catch (caughtError: unknown) {
-      const apiError = caughtError as CartError
-
       if (
-        apiError?.code === 'TOKEN_EXPIRED' ||
-        apiError?.code === 'INVALID_TOKEN' ||
-        apiError?.code === 'UNAUTHORIZED'
+        isApiError(caughtError) &&
+        [
+          'TOKEN_EXPIRED',
+          'INVALID_TOKEN',
+          'UNAUTHORIZED',
+        ].includes(caughtError.code)
       ) {
         navigate('/login', {
           state: {
@@ -116,7 +86,12 @@ export function AddToCartButton({
         return
       }
 
-      setError(getCartErrorMessage(caughtError))
+      setError(
+        cartErrorText(
+          caughtError,
+          'პროდუქტის დამატება ვერ მოხერხდა.',
+        ),
+      )
     } finally {
       setIsSubmitting(false)
     }

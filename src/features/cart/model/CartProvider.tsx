@@ -9,6 +9,8 @@ import {
 
 import { useAuth } from '../../auth/model/useAuth'
 import { cartApi, type Cart } from '../api/cartApi'
+import { cartErrorText } from '../lib/cartErrors'
+import { isApiError } from '../../../shared/api/apiClient'
 import {
   CartContext,
   type CartContextValue,
@@ -30,19 +32,6 @@ const initialState: CartState = {
   isLoading: false,
   isMutating: false,
   error: null,
-}
-
-function getErrorMessage(error: unknown): string {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof error.message === 'string'
-  ) {
-    return error.message
-  }
-
-  return 'კალათის განახლება ვერ მოხერხდა.'
 }
 
 export function CartProvider({
@@ -136,7 +125,7 @@ function CartSession({
       setState((previous) => ({
         ...previous,
         isLoading: false,
-        error: getErrorMessage(error),
+        error: cartErrorText(error),
       }))
     }
   }, [userId])
@@ -157,16 +146,10 @@ function CartSession({
         )
       }
 
-      if (busyRef.current) {
-        throw new Error(
-          'დაელოდე მიმდინარე მოქმედების დასრულებას.',
-        )
-      }
-
-      if (state.isLoading) {
-        throw new Error(
-          'დაელოდე კალათის ჩატვირთვას.',
-        )
+      // Ignore repeated clicks while the cart is busy.
+      // The UI disables controls; this ref is a synchronous safety net.
+      if (busyRef.current || state.isLoading) {
+        return
       }
 
       busyRef.current = true
@@ -179,6 +162,8 @@ function CartSession({
         isMutating: true,
         error: null,
       }))
+
+      let needsRefresh = false
 
       try {
         const nextCart = await operation()
@@ -198,6 +183,10 @@ function CartSession({
           error: null,
         })
       } catch (error: unknown) {
+        // Stale line item: reload the server's authoritative cart.
+        needsRefresh =
+          isApiError(error) && error.code === 'CART_ITEM_NOT_FOUND'
+
         if (
           mountedRef.current &&
           sessionRef.current === userId
@@ -205,16 +194,24 @@ function CartSession({
           setState((previous) => ({
             ...previous,
             isMutating: false,
-            error: getErrorMessage(error),
+            error: cartErrorText(error),
           }))
         }
 
         throw error
       } finally {
         busyRef.current = false
+
+        if (
+          needsRefresh &&
+          mountedRef.current &&
+          sessionRef.current === userId
+        ) {
+          void refreshCart()
+        }
       }
     },
-    [state.isLoading, userId],
+    [refreshCart, state.isLoading, userId],
   )
 
   const addItem = useCallback(

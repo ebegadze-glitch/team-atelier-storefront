@@ -7,10 +7,23 @@ export type ApiError = {
   message: string
   code: string
   errors?: Record<string, string>
+  available?: number
 }
 
 type ApiClientOptions = RequestInit & {
   withAuth?: boolean
+}
+
+/** Narrows API errors without mistaking DOMException for an API response. */
+export function isApiError(error: unknown): error is ApiError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof error.code === 'string' &&
+    'message' in error &&
+    typeof error.message === 'string'
+  )
 }
 
 const INVALID_SESSION_CODES = new Set([
@@ -56,6 +69,13 @@ function getApiError(data: unknown): ApiError {
     if (entries.length > 0) {
       apiError.errors = Object.fromEntries(entries)
     }
+  }
+
+  if (
+    typeof body.available === 'number' &&
+    Number.isFinite(body.available)
+  ) {
+    apiError.available = body.available
   }
 
   return apiError

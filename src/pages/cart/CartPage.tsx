@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useCart } from '../../features/cart/model/useCart'
+import { cartErrorText } from '../../features/cart/lib/cartErrors'
 
 import './CartPage.css'
 
@@ -15,19 +16,6 @@ function formatPrice(
   })
 
   return `${formatted} ${currency === 'GEL' ? '₾' : currency}`
-}
-
-function getErrorMessage(error: unknown) {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof error.message === 'string'
-  ) {
-    return error.message
-  }
-
-  return 'ოპერაცია ვერ შესრულდა. სცადე ხელახლა.'
 }
 
 export default function CartPage() {
@@ -50,6 +38,7 @@ export default function CartPage() {
   ) {
     if (
       isMutating ||
+      isLoading ||
       !Number.isInteger(quantity) ||
       quantity < 1 ||
       quantity > 99
@@ -63,13 +52,13 @@ export default function CartPage() {
       await updateItem(lineId, quantity)
     } catch (requestError) {
       setOperationError(
-        getErrorMessage(requestError),
+        cartErrorText(requestError),
       )
     }
   }
 
   async function handleRemove(lineId: string) {
-    if (isMutating) {
+    if (isMutating || isLoading) {
       return
     }
 
@@ -79,7 +68,7 @@ export default function CartPage() {
       await removeItem(lineId)
     } catch (requestError) {
       setOperationError(
-        getErrorMessage(requestError),
+        cartErrorText(requestError),
       )
     }
   }
@@ -91,7 +80,7 @@ export default function CartPage() {
       await refreshCart()
     } catch (requestError) {
       setOperationError(
-        getErrorMessage(requestError),
+        cartErrorText(requestError),
       )
     }
   }
@@ -215,14 +204,15 @@ export default function CartPage() {
                   const stock = item.product.stock
 
                   const canDecrease =
-                    item.qty > 1 && !isMutating
+                    item.qty > 1 && !isMutating && !isLoading
 
                   const canIncrease =
                     item.qty < 99 &&
                     item.product.inStock !== false &&
                     (stock === undefined ||
                       item.qty < stock) &&
-                    !isMutating
+                    !isMutating &&
+                    !isLoading
 
                   return (
                     <article
@@ -263,7 +253,7 @@ export default function CartPage() {
                             type="button"
                             className="cart-remove-button"
                             aria-label={`${item.product.title} — წაშლა კალათიდან`}
-                            disabled={isMutating}
+                            disabled={isMutating || isLoading}
                             onClick={() => {
                               void handleRemove(item.id)
                             }}
