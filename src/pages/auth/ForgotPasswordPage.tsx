@@ -15,7 +15,7 @@ import {
   resetPassword,
   verifyResetCode,
 } from '../../features/auth/api/authApi'
-import type { ApiError } from '../../shared/api/apiClient'
+import { isApiError } from '../../shared/api/apiClient'
 
 import {
   forgotPasswordSchema,
@@ -42,14 +42,6 @@ type NewPasswordFormData = z.infer<typeof newPasswordSchema>
 
 type Step = 'email' | 'code' | 'password' | 'success'
 
-function isApiError(error: unknown): error is ApiError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error
-  )
-}
 
 function ForgotPasswordPage() {
   const [step, setStep] = useState<Step>('email')

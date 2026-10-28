@@ -18,27 +18,16 @@ import ProductDetailsPage from './pages/product/ProductDetailsPage'
 import ProfilePage from './pages/profile/ProfilePage'
 import AddressesPage from './pages/addresses/AddressesPage'
 import CartPage from './pages/cart/CartPage'
+import CheckoutPage from './pages/checkout/CheckoutPage'
+import ConfirmPaymentPage from './pages/checkout/ConfirmPaymentPage'
+import OrderDetailsPage from './pages/checkout/OrderDetailsPage'
+import SiteFooter from './shared/ui/SiteFooter'
 
 import { ProtectedRoute } from './features/auth/model/ProtectedRoute'
 import { useAuth } from './features/auth/model/useAuth'
 
 type PublicOnlyRouteProps = {
   children: ReactNode
-}
-
-function RootRedirect() {
-  const { status } = useAuth()
-
-  if (status === 'loading') {
-    return <p>Loading...</p>
-  }
-
-  return (
-    <Navigate
-      to={status === 'authenticated' ? '/home' : '/login'}
-      replace
-    />
-  )
 }
 
 function PublicOnlyRoute({
@@ -63,7 +52,7 @@ export default function App() {
       <Routes>
         <Route
           path="/"
-          element={<RootRedirect />}
+          element={<Navigate to="/home" replace />}
         />
 
         <Route
@@ -93,11 +82,10 @@ export default function App() {
           }
         />
 
+        {/* The showroom is public; protected features remain behind login. */}
+        <Route path="/home" element={<HomePage />} />
+
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="/home"
-            element={<HomePage />}
-          />
 
           <Route
             path="/profile"
@@ -113,6 +101,9 @@ export default function App() {
             path="/cart"
             element={<CartPage />}
           />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout/confirm/:orderId" element={<ConfirmPaymentPage />} />
+          <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
         </Route>
 
         <Route
@@ -132,6 +123,7 @@ export default function App() {
           }
         />
       </Routes>
+      <SiteFooter />
     </BrowserRouter>
   )
 }

@@ -20,7 +20,7 @@ import {
 } from '../../features/auth/api/authApi'
 import { tokenStorage } from '../../features/auth/model/tokenStorage'
 import { useAuth } from '../../features/auth/model/useAuth'
-import type { ApiError } from '../../shared/api/apiClient'
+import { isApiError } from '../../shared/api/apiClient'
 
 import {
   loginSchema,
@@ -37,16 +37,6 @@ type LoginLocationState = {
   }
 }
 
-function isApiError(error: unknown): error is ApiError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    typeof error.code === 'string' &&
-    'message' in error &&
-    typeof error.message === 'string'
-  )
-}
 
 function getReturnDestination(
   state: unknown,

@@ -9,7 +9,7 @@ import {
   type UpdateMePayload,
 } from '../../features/auth/api/authApi'
 import { useAuth } from '../../features/auth/model/useAuth'
-import type { ApiError } from '../../shared/api/apiClient'
+import { isApiError } from '../../shared/api/apiClient'
 
 import Alert from '../../shared/ui/Alert'
 import Button from '../../shared/ui/Button'
@@ -32,16 +32,6 @@ const profileFields = [
   'confirmNewPassword',
 ] as const
 
-function isApiError(error: unknown): error is ApiError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    typeof error.code === 'string' &&
-    'message' in error &&
-    typeof error.message === 'string'
-  )
-}
 
 export default function ProfilePage() {
   const { user, setAuthenticatedUser } = useAuth()
@@ -105,13 +95,6 @@ export default function ProfilePage() {
     setFormError(null)
     setSuccessMessage(null)
 
-    if (!values.currentPassword.trim()) {
-      setError('currentPassword', {
-        message: 'შეიყვანე მიმდინარე პაროლი',
-      })
-      return
-    }
-
     const payload: UpdateMePayload = {
       currentPassword: values.currentPassword,
     }
@@ -153,14 +136,14 @@ export default function ProfilePage() {
       if (error.code === 'INVALID_CURRENT_PASSWORD') {
         setError('currentPassword', {
           message: 'პაროლი არასწორია',
-        })
+        }, { shouldFocus: true })
         return
       }
 
       if (error.code === 'EMAIL_TAKEN') {
         setError('email', {
           message: 'ეს ელფოსტა უკვე გამოიყენება',
-        })
+        }, { shouldFocus: true })
         return
       }
 
@@ -182,6 +165,7 @@ export default function ProfilePage() {
               setError(
                 field as (typeof profileFields)[number],
                 { message },
+                { shouldFocus: true },
               )
             }
           },

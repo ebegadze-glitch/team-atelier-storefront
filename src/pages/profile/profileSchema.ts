@@ -10,7 +10,7 @@ export const profileSchema = z
       .min(1, 'Email is required')
       .pipe(z.email('Enter a valid email address')),
 
-    currentPassword: z.string(),
+    currentPassword: z.string().refine((value) => value.trim().length > 0, 'შეიყვანე მიმდინარე პაროლი'),
 
     newPassword: z.string(),
 

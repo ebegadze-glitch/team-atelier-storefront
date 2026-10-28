@@ -15,7 +15,7 @@ import {
 } from '../../features/auth/api/authApi'
 import { tokenStorage } from '../../features/auth/model/tokenStorage'
 import { useAuth } from '../../features/auth/model/useAuth'
-import type { ApiError } from '../../shared/api/apiClient'
+import { isApiError } from '../../shared/api/apiClient'
 
 import {
   registerSchema,
@@ -24,14 +24,6 @@ import {
 
 import './RegisterPage.css'
 
-function isApiError(error: unknown): error is ApiError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error
-  )
-}
 
 function RegisterPage() {
   const navigate = useNavigate()

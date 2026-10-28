@@ -32,6 +32,7 @@ function ProductContent({ slug }: ProductContentProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [quantity, setQuantity] = useState(1)
   const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
@@ -123,16 +124,25 @@ function ProductContent({ slug }: ProductContentProps) {
   )
 
   const relatedProducts = product.related ?? []
+  const stock = typeof product.stock === 'number' ? Math.max(0, product.stock) : null
+  const isOutOfStock = product.inStock === false || stock === 0
+  const maxQuantity = Math.max(1, Math.min(Math.floor(stock ?? 99), 99))
+  const currency = product.currency === 'GEL' || !product.currency ? '₾' : product.currency
+
+  function changeQuantity(next: number) {
+    setQuantity(Math.max(1, Math.min(maxQuantity, next)))
+  }
 
   return (
     <main className="product-details-page">
       <div className="product-details-container">
-        <Link
-          className="product-back-link"
-          to="/catalog"
-        >
-          ← კატალოგში დაბრუნება
-        </Link>
+        <nav className="product-breadcrumbs" aria-label="პროდუქტის ნავიგაცია">
+          <Link to="/home">მთავარი</Link>
+          <span aria-hidden="true">/</span>
+          <Link to="/catalog">{product.category?.name ?? 'ავეჯი'}</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{product.title}</span>
+        </nav>
 
         <div className="product-details-layout">
           {/* Product image gallery */}
@@ -144,7 +154,7 @@ function ProductContent({ slug }: ProductContentProps) {
               {activeImage ? (
                 <img
                   src={activeImage}
-                  alt={product.title}
+                  alt={`${product.title} — ფოტო ${Math.min(selectedImage + 1, images.length)} / ${images.length}`}
                 />
               ) : (
                 <div className="product-details-placeholder">
@@ -176,14 +186,14 @@ function ProductContent({ slug }: ProductContentProps) {
                     onClick={() => {
                       setSelectedImage(index)
                     }}
-                    aria-label={`ფოტო ${index + 1}`}
+                    aria-label={`${product.title} — ფოტო ${index + 1} / ${images.length}`}
                     aria-pressed={
                       index === selectedImage
                     }
                   >
                     <img
                       src={image}
-                      alt={`${product.title} — ფოტო ${index + 1}`}
+                      alt={`${product.title} — ფოტო ${index + 1} / ${images.length}`}
                       loading="lazy"
                     />
                   </button>
@@ -214,45 +224,72 @@ function ProductContent({ slug }: ProductContentProps) {
 
             <div className="product-details-price">
               <strong>
-                {product.price} ₾
+                {product.price} {currency}
               </strong>
 
               {product.oldPrice ? (
                 <span>
-                  {product.oldPrice} ₾
+                  {product.oldPrice} {currency}
                 </span>
               ) : null}
             </div>
 
             <div
               className={
-                product.inStock === true
+                !isOutOfStock
                   ? 'product-details-stock product-details-stock--available'
                   : 'product-details-stock product-details-stock--unavailable'
               }
             >
               <span className="stock-dot" />
 
-              {product.inStock === true
-                ? 'მარაგშია'
-                : product.inStock === false
-                  ? 'არ არის მარაგში'
-                  : 'მარაგის ინფორმაცია მიუწვდომელია'}
+              {isOutOfStock
+                ? 'ამოწურულია'
+                : stock !== null && stock <= 5
+                  ? `დარჩა მხოლოდ ${stock} ცალი`
+                  : 'მარაგშია'}
             </div>
 
-            {product.warrantyMonths !== undefined &&
-              product.warrantyMonths !== null && (
+            {typeof product.warrantyMonths === 'number' &&
+              product.warrantyMonths > 0 && (
                 <div className="product-details-warranty">
                   <strong>გარანტია:</strong>{' '}
                   {product.warrantyMonths} თვე
                 </div>
               )}
 
-            {/* Add to cart */}
+            {/* FE-007: choose 1–min(stock, 99) items before adding to the server cart. */}
+            <div className="product-quantity" role="group" aria-label="პროდუქტის რაოდენობა">
+              <span className="product-quantity-label">რაოდენობა</span>
+              <div className="product-quantity-controls">
+                <button
+                  type="button"
+                  aria-label="რაოდენობის შემცირება"
+                  onClick={() => changeQuantity(quantity - 1)}
+                  disabled={isOutOfStock || quantity <= 1}
+                >
+                  −
+                </button>
+                <output aria-live="polite" aria-label="არჩეული რაოდენობა">{quantity}</output>
+                <button
+                  type="button"
+                  aria-label="რაოდენობის გაზრდა"
+                  onClick={() => changeQuantity(quantity + 1)}
+                  disabled={isOutOfStock || quantity >= maxQuantity}
+                >
+                  +
+                </button>
+              </div>
+              {stock !== null && !isOutOfStock && (
+                <span className="product-quantity-limit">მაქს. {maxQuantity} ცალი</span>
+              )}
+            </div>
+
             <AddToCartButton
               key={product.id}
               productId={product.id}
-              inStock={product.inStock}
+              qty={quantity}
+              inStock={!isOutOfStock}
             />
 
             <div className="product-details-divider" />

@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ShoppingBag } from 'lucide-react'
 
 import { useCart } from '../../features/cart/model/useCart'
 import { cartErrorText } from '../../features/cart/lib/cartErrors'
@@ -168,7 +169,7 @@ export default function CartPage() {
               className="cart-empty-icon"
               aria-hidden="true"
             >
-              🛍️
+              <ShoppingBag size={48} strokeWidth={1.8} />
             </span>
 
             <h2>კალათა ცარიელია</h2>
@@ -399,8 +400,7 @@ export default function CartPage() {
 
               <p className="cart-summary-note">
                 თანხა და რაოდენობა მიღებულია
-                სერვერიდან. გადახდის პროცესი
-                დაემატება FE-006 ეტაპზე.
+                სერვერიდან. გადახდა სატესტოა — თანხა არ ჩამოგეჭრება.
               </p>
 
               {isMutating && (
@@ -414,9 +414,9 @@ export default function CartPage() {
 
               <Link
                 className="cart-primary-link cart-summary-continue"
-                to="/catalog"
+                to="/checkout"
               >
-                კატალოგში დაბრუნება →
+                შეკვეთის გაფორმება →
               </Link>
             </aside>
           </div>

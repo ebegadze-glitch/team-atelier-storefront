@@ -8,6 +8,8 @@ export type ApiError = {
   code: string
   errors?: Record<string, string>
   available?: number
+  retryAfterSeconds?: number
+  items?: unknown[]
 }
 
 type ApiClientOptions = RequestInit & {
@@ -76,6 +78,14 @@ function getApiError(data: unknown): ApiError {
     Number.isFinite(body.available)
   ) {
     apiError.available = body.available
+  }
+
+  if (typeof body.retryAfterSeconds === 'number' && Number.isFinite(body.retryAfterSeconds)) {
+    apiError.retryAfterSeconds = body.retryAfterSeconds
+  }
+
+  if (Array.isArray(body.items)) {
+    apiError.items = body.items
   }
 
   return apiError

@@ -6,6 +6,7 @@ import {
   type ChangeEvent,
 } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { ShoppingBag } from 'lucide-react'
 
 import {
   getCatalogCategory,
@@ -18,6 +19,8 @@ import {
 import { useCart } from '../../features/cart/model/useCart'
 import { AddToCartButton } from '../../features/cart/ui/AddToCartButton'
 
+import { fetchProductsForFurnitureType, getFurnitureCategory } from '../../shared/data/furnitureCategories'
+
 import './CatalogPage.css'
 
 const RESERVED_PARAMS = new Set([
@@ -26,6 +29,7 @@ const RESERVED_PARAMS = new Set([
   'q',
   'minPrice',
   'maxPrice',
+  'type', // ATELIER's six visual types are client-side, not API filter keys
 ])
 
 const COLOR_MAP: Record<string, string> = {
@@ -371,6 +375,8 @@ export default function CatalogPage() {
   const query =
     searchParams.get('q') ?? ''
 
+  const selectedFurniture = getFurnitureCategory(searchParams.get('type'))
+
   const rawPage = Number(
     searchParams.get('page') ?? '1',
   )
@@ -466,27 +472,24 @@ export default function CatalogPage() {
             ? pageParam
             : 1
 
-        const data = await getProducts({
-          sort:
-            params.get('sort') ?? 'newest',
+        const productParams = {
+          sort: params.get('sort') ?? 'newest',
           page: validPage,
-          q:
-            params.get('q') || undefined,
-          minPrice:
-            minParam !== null &&
-            minParam !== '' &&
-            Number.isFinite(Number(minParam))
-              ? Number(minParam)
-              : undefined,
-          maxPrice:
-            maxParam !== null &&
-            maxParam !== '' &&
-            Number.isFinite(Number(maxParam))
-              ? Number(maxParam)
-              : undefined,
+          q: params.get('q') || undefined,
+          minPrice: minParam !== null && minParam !== '' && Number.isFinite(Number(minParam))
+            ? Number(minParam) : undefined,
+          maxPrice: maxParam !== null && maxParam !== '' && Number.isFinite(Number(maxParam))
+            ? Number(maxParam) : undefined,
           filters,
           signal: controller.signal,
-        })
+        }
+
+        // A furniture type spans all brands. Fetch all pages first,
+        // then apply an exact type classifier and paginate that result.
+        const requestedType = getFurnitureCategory(params.get('type'))
+        const data = requestedType
+          ? await fetchProductsForFurnitureType(requestedType.query, productParams)
+          : await getProducts(productParams)
 
         if (controller.signal.aborted) {
           return
@@ -856,7 +859,7 @@ export default function CatalogPage() {
             </Link>
 
             <Link
-              className="catalog-top-link"
+              className="catalog-top-link catalog-cart-link"
               to="/cart"
               aria-label={
                 isCartLoading
@@ -864,7 +867,8 @@ export default function CatalogPage() {
                   : `კალათა: ${cartQuantity} ერთეული`
               }
             >
-              🛍 კალათა
+              <ShoppingBag size={19} strokeWidth={1.8} aria-hidden="true" />
+              კალათა
               {!isCartLoading && (
                 <span>
                   {' '}({cartQuantity})
@@ -878,14 +882,22 @@ export default function CatalogPage() {
           </p>
 
           <h1>
-            {category?.name ?? 'კატალოგი'}
+
+{selectedFurniture
+  ? selectedFurniture.name
+  : (category?.name ?? 'კატალოგი')}
+
           </h1>
 
-          {category?.description && (
-            <p className="catalog-description">
-              {category.description}
-            </p>
-          )}
+
+
+{!selectedFurniture && category?.description ? (
+  <p className="catalog-description">
+    {category.description}
+  </p>
+) : null}
+
+
         </header>
 
         {/* SEARCH AND SORT */}

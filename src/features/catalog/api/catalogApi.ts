@@ -40,6 +40,8 @@ export type Product = {
   rating?: number
   reviewsCount?: number
   inStock?: boolean
+  stock?: number
+  currency?: string
 }
 
 export type ProductsResponse = {
@@ -52,6 +54,7 @@ export type ProductsResponse = {
 }
 
 export type ProductDetails = Product & {
+  category?: { slug: string; name: string }
   images?: string[]
   specs?: Record<string, string | number | boolean>
   warrantyMonths?: number
