@@ -4,12 +4,12 @@ import { getProducts, type GetProductsParams, type Product, type ProductsRespons
  * The API's category is currently only `furniture`; it is not one of these six types.
  */
 export const furnitureCategories = [
-  { name: 'დივანი', icon: 'sofa.svg', query: 'sofa' },
-  { name: 'სავარძელი', icon: 'armchair.svg', query: 'armchair' },
-  { name: 'მაგიდა', icon: 'table.svg', query: 'table' },
-  { name: 'სკამი', icon: 'chair.svg', query: 'chair' },
-  { name: 'კარადა', icon: 'wardrobe.svg', query: 'wardrobe' },
-  { name: 'საწოლი', icon: 'bed.svg', query: 'bed' },
+  { name: 'დივანი', icon: 'sofa.svg', en: 'Sofa', query: 'sofa' },
+  { name: 'სავარძელი', icon: 'armchair.svg', en: 'Armchair', query: 'armchair' },
+  { name: 'მაგიდა', icon: 'table.svg', en: 'Table', query: 'table' },
+  { name: 'სკამი', icon: 'chair.svg', en: 'Chair', query: 'chair' },
+  { name: 'კარადა', icon: 'wardrobe.svg', en: 'Wardrobe', query: 'wardrobe' },
+  { name: 'საწოლი', icon: 'bed.svg', en: 'Bed', query: 'bed' },
 ] as const
 
 export type FurnitureType = (typeof furnitureCategories)[number]['query']

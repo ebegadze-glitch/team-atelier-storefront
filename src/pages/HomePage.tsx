@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+
 import { Grid2X2, Heart, LogIn, LogOut, ShoppingBag, UserRound } from 'lucide-react'
 
 import { useAuth } from '../features/auth/model/useAuth'
@@ -23,6 +25,7 @@ const brands = [
 const imageBase = '/images/home/'
 
 function Header() {
+  const { t, i18n } = useTranslation()
   const { status, logout } = useAuth()
   const { cart, isLoading: isCartLoading } = useCart()
   const isSignedIn = status === 'authenticated'
@@ -36,7 +39,7 @@ function Header() {
       <nav className="home-navigation" aria-label="მთავარი მენიუ">
         <Link className="home-nav-button" to="/catalog">
           <Grid2X2 size={19} strokeWidth={1.8} aria-hidden="true" />
-          კატალოგი
+          {t('catalog')}
         </Link>
         <button
           type="button"
@@ -46,7 +49,7 @@ function Header() {
           aria-label="სურვილების სია — მოგვიანებით"
         >
           <Heart size={19} strokeWidth={1.8} aria-hidden="true" />
-          სურვილები
+          {t("wishlist")}
         </button>
         <Link
           to="/cart"
@@ -54,7 +57,7 @@ function Header() {
           aria-label={isCartLoading ? 'კალათა იტვირთება' : `კალათა — ${cartQuantity} პროდუქტი`}
         >
           <ShoppingBag size={19} strokeWidth={1.8} aria-hidden="true" />
-          კალათა
+          {t("cart")}
           {!isCartLoading && cartQuantity > 0 && (
             <span className="home-cart-badge" aria-hidden="true">{cartQuantity}</span>
           )}
@@ -63,25 +66,27 @@ function Header() {
           <>
             <Link className="home-nav-button" to="/profile">
               <UserRound size={19} strokeWidth={1.8} aria-hidden="true" />
-              პროფილი
+              {t("profile")}
             </Link>
             <button type="button" className="home-nav-button" onClick={logout}>
               <LogOut size={19} strokeWidth={1.8} aria-hidden="true" />
-              გასვლა
+              {t("logout")}
             </button>
           </>
         ) : (
           <Link className="home-nav-button" to="/login">
             <LogIn size={19} strokeWidth={1.8} aria-hidden="true" />
-            შესვლა
+            {t("login")}
           </Link>
         )}
+        <button type="button" className="home-nav-button" onClick={() => { const next = i18n.language === "en" ? "ka" : "en"; localStorage.setItem("atelier-language", next); void i18n.changeLanguage(next) }}>{i18n.language === "en" ? "EN / KA" : "KA / EN"}</button>
       </nav>
     </header>
   )
 }
 
 export default function HomePage() {
+  const { i18n } = useTranslation()
   return (
     <main className="home-page">
       <div className="home-container">
@@ -133,7 +138,7 @@ export default function HomePage() {
                   alt=""
                   loading="lazy"
                 />
-                <span className="home-category-name">{category.name}</span>
+                <span className="home-category-name">{i18n.language === "en" ? category.en : category.name}</span>
               </Link>
             ))}
           </div>

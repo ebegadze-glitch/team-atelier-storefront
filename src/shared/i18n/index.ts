@@ -17,6 +17,7 @@ void i18n.use(initReactI18next).init({
         logout: 'გასვლა',
         checkout: 'შეკვეთის გაფორმება',
         language: 'ენა',
+        wishlist: 'სურვილები',
       },
     },
     en: {
@@ -30,6 +31,7 @@ void i18n.use(initReactI18next).init({
         logout: 'Logout',
         checkout: 'Checkout',
         language: 'Language',
+        wishlist: 'Wishlist',
       },
     },
   },
