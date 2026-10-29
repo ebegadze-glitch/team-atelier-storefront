@@ -1,12 +1,29 @@
 import './shared/i18n/index'
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './shared/styles/tokens.css' 
-import './index.css'
-import App from './App.tsx'
 
-createRoot(document.getElementById('root')!).render(
+import App from './App'
+
+import { AuthProvider } from './features/auth/model/AuthProvider'
+import { CartProvider } from './features/cart/model/CartProvider'
+
+import './shared/styles/tokens.css'
+import './index.css'
+
+const rootElement = document.getElementById('root')
+
+if (!rootElement) {
+  throw new Error('Root element was not found.')
+}
+
+createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <AuthProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </AuthProvider>
   </StrictMode>,
 )
+ 

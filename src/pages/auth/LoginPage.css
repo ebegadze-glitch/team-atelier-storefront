@@ -36,11 +36,6 @@
   gap: var(--space-16);
 }
 
-.login-form label {
-  font-size: var(--font-size-label);
-  font-weight: 500;
-}
-
 .login-link {
   display: inline-block;
   margin-top: var(--space-16);
@@ -57,15 +52,10 @@
   color: var(--text-primary);
   text-decoration: underline;
 }
-.login-error {
-  margin: calc(var(--space-8) * -1) 0 0;
-  color: var(--error-text);
-  font-size: var(--font-size-caption);
-  line-height: var(--line-height-caption);
-} 
+
 @media (max-width: 480px) {
   .login-page {
     align-items: flex-start;
     padding: var(--space-32) var(--space-20);
   }
-}
+} 
