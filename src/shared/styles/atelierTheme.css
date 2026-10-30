@@ -1,0 +1,119 @@
+/* ATELIER design tokens and one visual language across current pages.
+   This file changes presentation only — not auth, cart, checkout or API logic. */
+:root {
+  --atelier-ink: #101010;
+  --atelier-page: #faf9f6;
+  --atelier-surface: #eae2d8;
+  --atelier-hover: #ded4c8;
+  --atelier-border: #d6ccbe;
+  --atelier-radius: 12px;
+  --atelier-control-height: 48px;
+  --background-page: var(--atelier-page);
+  --background-subtle: #f3efe9;
+  --text-primary: var(--atelier-ink);
+  --text-secondary: var(--atelier-ink);
+  --border-default: var(--atelier-border);
+  --border-subtle: #e5ded6;
+  --action-primary-bg: var(--atelier-surface);
+  --action-primary-bg-hover: var(--atelier-hover);
+  --action-primary-text: var(--atelier-ink);
+  --action-secondary-bg: var(--atelier-surface);
+  --action-secondary-text: var(--atelier-ink);
+  --focus-ring: var(--atelier-ink);
+  --radius-md: var(--atelier-radius);
+  --radius-lg: 18px;
+  --font-family-primary: -apple-system, BlinkMacSystemFont, "Noto Sans Georgian", "DejaVu Sans", "Inter", Arial, sans-serif;
+}
+html, body, button, input, textarea, select {
+  font-family: var(--font-family-primary);
+}
+body {
+  background: var(--atelier-page);
+  color: var(--atelier-ink);
+}
+:is(.cart-page, .checkout-page, .catalog-page, .product-details-page, .profile-page, .addresses-page) {
+  background: var(--atelier-page);
+  color: var(--atelier-ink);
+}
+:is(.cart-page, .checkout-page, .catalog-page, .product-details-page, .profile-page, .addresses-page)
+  :is(h1, h2, h3, label, strong) {
+  color: var(--atelier-ink);
+}
+/* Shared border radius and warm neutrals for purchase actions. */
+:is(.cart-page, .checkout-page, .catalog-page, .product-details-page, .profile-page, .addresses-page)
+  :is(.cart-item, .cart-summary, .checkout-panel, .product-card,
+      .related-product-card, .catalog-sidebar, .profile-container,
+      .address-card, .addresses-form-card) {
+  border-color: var(--atelier-border);
+}
+.cart-page a.cart-primary-link,
+.checkout-page .checkout-primary,
+.catalog-page .catalog-state button,
+.catalog-page .catalog-top-link,
+.product-details-page .continue-shopping-button,
+.product-details-page .back-to-catalog-button,
+.add-to-cart .add-to-cart-button,
+.button.button--primary,
+.button.button--secondary {
+  background: var(--atelier-surface);
+  color: var(--atelier-ink);
+  border: 1px solid var(--atelier-border);
+  border-radius: var(--atelier-radius);
+  font-family: var(--font-family-primary);
+  font-weight: 650;
+}
+.cart-page a.cart-primary-link:hover,
+.checkout-page .checkout-primary:hover:not(:disabled),
+.catalog-page .catalog-state button:hover:not(:disabled),
+.catalog-page .catalog-top-link:hover,
+.product-details-page .continue-shopping-button:hover,
+.product-details-page .back-to-catalog-button:hover,
+.add-to-cart .add-to-cart-button:hover:not(:disabled),
+.button.button--primary:hover:not(:disabled),
+.button.button--secondary:hover:not(:disabled) {
+  background: var(--atelier-hover);
+  border-color: #a99b88;
+  color: var(--atelier-ink);
+}
+.cart-page .cart-quantity,
+.cart-page .cart-quantity button,
+.checkout-page .checkout-field input,
+.checkout-page .checkout-field select,
+.catalog-page .catalog-search input,
+.catalog-page .catalog-sort select,
+.catalog-page .price-inputs input {
+  border-color: var(--atelier-border);
+  border-radius: var(--atelier-radius);
+  color: var(--atelier-ink);
+}
+.cart-page .cart-quantity button:not(:disabled) {
+  background: var(--atelier-surface);
+  border-radius: 0;
+}
+.cart-page .cart-quantity button:hover:not(:disabled) {
+  background: var(--atelier-hover);
+}
+.checkout-page .checkout-section-label > span {
+  background: var(--atelier-surface);
+  color: var(--atelier-ink);
+}
+:is(.cart-page, .checkout-page, .catalog-page, .product-details-page, .profile-page, .addresses-page)
+  :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--atelier-ink);
+  outline-offset: 3px;
+}
+/* Keep warnings/errors red, success/stock states distinct, and discount text legible. */
+.catalog-page .discount-badge,
+.product-details-page .product-details-discount,
+.product-details-page .related-product-discount {
+  color: #fff;
+}
+.checkout-page .checkout-field small,
+.checkout-page .checkout-error,
+.cart-page .cart-error,
+.add-to-cart .add-to-cart-error {
+  color: #a32929;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-nav-button { transition: none; }
+}

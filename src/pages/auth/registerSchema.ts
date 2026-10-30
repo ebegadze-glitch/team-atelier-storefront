@@ -9,11 +9,13 @@ export const registerSchema = z
     email: z
       .string()
       .min(1, 'Email is required')
-      .email('Enter a valid email address'),
+      .pipe(z.email('Enter a valid email address')),
 
     password: z
       .string()
-      .min(8, 'Password must be at least 8 characters'),
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[a-zA-Z]/, 'Password must contain at least one letter')
+      .regex(/\d/, 'Password must contain at least one number'),
 
     confirmPassword: z
       .string()
@@ -24,4 +26,4 @@ export const registerSchema = z
     path: ['confirmPassword'],
   })
 
-export type RegisterFormData = z.infer<typeof registerSchema> 
+export type RegisterFormData = z.infer<typeof registerSchema>

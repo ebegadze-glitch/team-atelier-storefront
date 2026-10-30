@@ -1,86 +1,248 @@
+import { useTranslation } from 'react-i18next'
+
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
+
 import Button from '../../shared/ui/Button'
+import FormField from '../../shared/ui/FormField'
 import Input from '../../shared/ui/Input'
 import PasswordInput from '../../shared/ui/PasswordInput'
-import { loginSchema, type LoginFormData } from './loginSchema'
+import Alert from '../../shared/ui/Alert'
+
+import {
+  getMe,
+  login,
+} from '../../features/auth/api/authApi'
+import { tokenStorage } from '../../features/auth/model/tokenStorage'
+import { useAuth } from '../../features/auth/model/useAuth'
+import { isApiError } from '../../shared/api/apiClient'
+
+import {
+  loginSchema,
+  type LoginFormData,
+} from './loginSchema'
+
 import './LoginPage.css'
 
+type LoginLocationState = {
+  from?: {
+    pathname?: string
+    search?: string
+    hash?: string
+  }
+}
+
+
+function getReturnDestination(
+  state: unknown,
+): string {
+  if (
+    typeof state !== 'object' ||
+    state === null ||
+    !('from' in state)
+  ) {
+    return '/home'
+  }
+
+  const from = (state as LoginLocationState).from
+  const pathname = from?.pathname
+
+  if (
+    typeof pathname !== 'string' ||
+    !pathname.startsWith('/') ||
+    pathname.startsWith('//') ||
+    pathname === '/login'
+  ) {
+    return '/home'
+  }
+
+  const search =
+    typeof from?.search === 'string' &&
+    from.search.startsWith('?')
+      ? from.search
+      : ''
+
+  const hash =
+    typeof from?.hash === 'string' &&
+    from.hash.startsWith('#')
+      ? from.hash
+      : ''
+
+  return `${pathname}${search}${hash}`
+}
+
 function LoginPage() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const { setAuthenticatedUser } = useAuth()
+
+  const [formError, setFormError] = useState<string | null>(
+    null,
+  )
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {
+      errors,
+      isSubmitting,
+    },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
 
+  const onSubmit = async (values: LoginFormData) => {
+    setFormError(null)
+
+    try {
+      const authData = await login(values)
+
+      tokenStorage.set(authData.accessToken)
+
+      const userData = await getMe()
+
+      const destination = getReturnDestination(
+        location.state,
+      )
+
+      setAuthenticatedUser(userData.user)
+
+      navigate(destination, {
+        replace: true,
+      })
+    } catch (error: unknown) {
+      tokenStorage.remove()
+
+      if (!isApiError(error)) {
+        setFormError(
+          t('login.unexpected'),
+        )
+        return
+      }
+
+      if (error.code === 'INVALID_CREDENTIALS') {
+        setFormError(t('login.badCredentials'))
+        return
+      }
+
+      if (error.code === 'NETWORK_ERROR') {
+        setFormError(
+          t('auto.010'),
+        )
+        return
+      }
+
+      setFormError(error.message)
+    }
+  }
+
   return (
     <main className="login-page">
-      <section className="login-card" aria-labelledby="login-title">
-        <p className="login-brand">ATELIER</p>
+      <section
+        className="login-card"
+        aria-labelledby="login-title"
+      >
+        <p className="login-brand">
+          ATELIER
+        </p>
 
-        <h1 className="login-title" id="login-title">
-          Welcome back
+        <h1
+          className="login-title"
+          id="login-title"
+        >
+          {t('login.welcome')}
         </h1>
 
         <p className="login-subtitle">
-          Sign in to continue to Atelier.
+          {t('login.subtitle')}
         </p>
+
+        {formError && (
+          <Alert variant="error">
+            {formError}
+          </Alert>
+        )}
 
         <form
           className="login-form"
-          onSubmit={handleSubmit(() => {})}
+          onSubmit={handleSubmit(onSubmit)}
           noValidate
         >
-          <label htmlFor="email">Email</label>
+          <FormField
+            label={t('login.email')}
+            htmlFor="email"
+            error={errors.email ? t(errors.email.type === 'too_small' ? 'login.emailRequired' : 'login.emailInvalid') : undefined}
+            errorId="email-error"
+          >
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              disabled={isSubmitting}
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={
+                errors.email
+                  ? 'email-error'
+                  : undefined
+              }
+              {...register('email')}
+            />
+          </FormField>
 
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? 'email-error' : undefined}
-            {...register('email')}
-          />
+          <FormField
+            label={t('login.password')}
+            htmlFor="password"
+            error={errors.password ? t('login.passwordRequired') : undefined}
+            errorId="password-error"
+          >
+            <PasswordInput
+              id="password"
+              autoComplete="current-password"
+              disabled={isSubmitting}
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={
+                errors.password
+                  ? 'password-error'
+                  : undefined
+              }
+              {...register('password')}
+            />
+          </FormField>
 
-          {errors.email && (
-            <p className="login-error" id="email-error">
-              {errors.email.message}
-            </p>
-          )}
-
-          <label htmlFor="password">Password</label>
-
-          <PasswordInput
-            id="password"
-            autoComplete="current-password"
-            aria-invalid={Boolean(errors.password)}
-            aria-describedby={
-              errors.password ? 'password-error' : undefined
-            }
-            {...register('password')}
-          />
-
-          {errors.password && (
-            <p className="login-error" id="password-error">
-              {errors.password.message}
-            </p>
-          )}
-
-          <Button type="submit">Continue</Button>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            disabled={isSubmitting}
+          >
+            {t('login.continue')}
+          </Button>
         </form>
 
-        <a className="login-link" href="/forgot-password">
-          Forgot password?
-        </a>
+        <Link
+          className="login-link"
+          to="/forgot-password"
+        >
+          {t('login.forgot')}
+        </Link>
 
         <p className="login-register">
-          New to Atelier? <a href="/register">Create account</a>
+          {t('login.new')}{' '}
+          <Link to="/register">
+            {t('login.create')}
+          </Link>
         </p>
       </section>
     </main>
   )
 }
 
-export default LoginPage 
+export default LoginPage
+
