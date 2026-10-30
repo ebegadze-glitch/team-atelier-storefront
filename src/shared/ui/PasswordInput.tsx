@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import type { ComponentPropsWithRef } from 'react'
 import Input from './Input'
@@ -10,6 +11,7 @@ type PasswordInputProps = Omit<
 
 function PasswordInput(props: PasswordInputProps) {
   const [visible, setVisible] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <div className="password-input">
@@ -22,9 +24,9 @@ function PasswordInput(props: PasswordInputProps) {
         className="password-toggle"
         type="button"
         onClick={() => setVisible((current) => !current)}
-        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-label={visible ? t('password.hideAria') : t('password.showAria')}
       >
-        {visible ? 'Hide' : 'Show'}
+        {visible ? t('password.hide') : t('password.show')}
       </button>
     </div>
   )

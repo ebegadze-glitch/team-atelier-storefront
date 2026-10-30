@@ -1,3 +1,7 @@
+import i18n from '../../shared/i18n/index'
+import { localizedProductField, localizedProductDescription } from '../../shared/i18n/productFields'
+import LocalizedText from '../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -11,21 +15,14 @@ import { AddToCartButton } from '../../features/cart/ui/AddToCartButton'
 
 import './ProductDetailsPage.css'
 
-function formatSpecValue(
-  value: string | number | boolean,
-): string {
-  if (typeof value === 'boolean') {
-    return value ? 'დიახ' : 'არა'
-  }
 
-  return String(value)
-}
 
 type ProductContentProps = {
   slug: string
 }
 
 function ProductContent({ slug }: ProductContentProps) {
+  useAtelierTranslation()
   const [product, setProduct] = useState<ProductDetails | null>(
     null,
   )
@@ -49,7 +46,7 @@ function ProductContent({ slug }: ProductContentProps) {
       .catch(() => {
         if (!active) return
 
-        setError('პროდუქტი ვერ ჩაიტვირთა')
+        setError(i18n.t("auto.192"))
         setLoading(false)
       })
 
@@ -66,7 +63,7 @@ function ProductContent({ slug }: ProductContentProps) {
             className="product-details-state"
             role="status"
           >
-            <p>პროდუქტი იტვირთება...</p>
+            <p><LocalizedText k="auto.193" /></p>
           </div>
         </div>
       </main>
@@ -79,7 +76,7 @@ function ProductContent({ slug }: ProductContentProps) {
         <div className="product-details-container">
           <div className="product-details-state">
             <p role="alert">
-              {error ?? 'პროდუქტი ვერ მოიძებნა'}
+              {error ?? i18n.t("auto.194")}
             </p>
 
             <button
@@ -91,15 +88,13 @@ function ProductContent({ slug }: ProductContentProps) {
                 setRetryCount((count) => count + 1)
               }}
             >
-              ხელახლა ცდა
-            </button>
+              <LocalizedText k="auto.083" /> </button>
 
             <Link
               className="back-to-catalog-button"
               to="/catalog"
             >
-              კატალოგში დაბრუნება
-            </Link>
+              <LocalizedText k="auto.195" /> </Link>
           </div>
         </div>
       </main>
@@ -136,10 +131,10 @@ function ProductContent({ slug }: ProductContentProps) {
   return (
     <main className="product-details-page">
       <div className="product-details-container">
-        <nav className="product-breadcrumbs" aria-label="პროდუქტის ნავიგაცია">
-          <Link to="/home">მთავარი</Link>
+        <nav className="product-breadcrumbs" aria-label={i18n.t("auto.196")}>
+          <Link to="/home"><LocalizedText k="auto.197" /></Link>
           <span aria-hidden="true">/</span>
-          <Link to="/catalog">{product.category?.name ?? 'ავეჯი'}</Link>
+          <Link to="/catalog">{i18n.language === "en" && product.category?.slug === "furniture" ? "Furniture" : product.category?.name ?? i18n.t("auto.198")}</Link>
           <span aria-hidden="true">/</span>
           <span aria-current="page">{product.title}</span>
         </nav>
@@ -148,7 +143,7 @@ function ProductContent({ slug }: ProductContentProps) {
           {/* Product image gallery */}
           <section
             className="product-details-media"
-            aria-label="პროდუქტის ფოტოები"
+            aria-label={i18n.t("auto.199")}
           >
             <div className="product-details-image">
               {activeImage ? (
@@ -158,8 +153,7 @@ function ProductContent({ slug }: ProductContentProps) {
                 />
               ) : (
                 <div className="product-details-placeholder">
-                  ფოტო არ არის
-                </div>
+                  <LocalizedText k="auto.092" /> </div>
               )}
 
               {product.discountPercent ? (
@@ -172,7 +166,7 @@ function ProductContent({ slug }: ProductContentProps) {
             {images.length > 1 && (
               <div
                 className="product-gallery-thumbnails"
-                aria-label="ფოტოების გალერეა"
+                aria-label={i18n.t("auto.200")}
               >
                 {images.map((image, index) => (
                   <button
@@ -218,8 +212,7 @@ function ProductContent({ slug }: ProductContentProps) {
               </span>
 
               <span>
-                ({product.reviewsCount ?? 0} შეფასება)
-              </span>
+                ({product.reviewsCount ?? 0} <LocalizedText k="auto.201" /> </span>
             </div>
 
             <div className="product-details-price">
@@ -244,36 +237,35 @@ function ProductContent({ slug }: ProductContentProps) {
               <span className="stock-dot" />
 
               {isOutOfStock
-                ? 'ამოწურულია'
+                ? i18n.t("auto.202")
                 : stock !== null && stock <= 5
                   ? `დარჩა მხოლოდ ${stock} ცალი`
-                  : 'მარაგშია'}
+                  : i18n.t("auto.126")}
             </div>
 
             {typeof product.warrantyMonths === 'number' &&
               product.warrantyMonths > 0 && (
                 <div className="product-details-warranty">
-                  <strong>გარანტია:</strong>{' '}
-                  {product.warrantyMonths} თვე
-                </div>
+                  <strong><LocalizedText k="auto.203" /></strong>{' '}
+                  {product.warrantyMonths} <LocalizedText k="auto.204" /> </div>
               )}
 
             {/* FE-007: choose 1–min(stock, 99) items before adding to the server cart. */}
-            <div className="product-quantity" role="group" aria-label="პროდუქტის რაოდენობა">
-              <span className="product-quantity-label">რაოდენობა</span>
+            <div className="product-quantity" role="group" aria-label={i18n.t("auto.205")}>
+              <span className="product-quantity-label"><LocalizedText k="auto.206" /></span>
               <div className="product-quantity-controls">
                 <button
                   type="button"
-                  aria-label="რაოდენობის შემცირება"
+                  aria-label={i18n.t("auto.207")}
                   onClick={() => changeQuantity(quantity - 1)}
                   disabled={isOutOfStock || quantity <= 1}
                 >
                   −
                 </button>
-                <output aria-live="polite" aria-label="არჩეული რაოდენობა">{quantity}</output>
+                <output aria-live="polite" aria-label={i18n.t("auto.208")}>{quantity}</output>
                 <button
                   type="button"
-                  aria-label="რაოდენობის გაზრდა"
+                  aria-label={i18n.t("auto.209")}
                   onClick={() => changeQuantity(quantity + 1)}
                   disabled={isOutOfStock || quantity >= maxQuantity}
                 >
@@ -281,7 +273,7 @@ function ProductContent({ slug }: ProductContentProps) {
                 </button>
               </div>
               {stock !== null && !isOutOfStock && (
-                <span className="product-quantity-limit">მაქს. {maxQuantity} ცალი</span>
+                <span className="product-quantity-limit"><LocalizedText k="auto.110" /> {maxQuantity} <LocalizedText k="auto.210" /></span>
               )}
             </div>
 
@@ -296,11 +288,11 @@ function ProductContent({ slug }: ProductContentProps) {
 
             {/* Description */}
             <div className="product-details-summary">
-              <h2>პროდუქტის შესახებ</h2>
+              <h2><LocalizedText k="auto.211" /></h2>
 
               <p>
-                {product.description?.trim() ||
-                  'პროდუქტის აღწერა არ არის მითითებული.'}
+                {localizedProductDescription(product.description?.trim() ?? '') ||
+                  i18n.t("auto.212")}
               </p>
             </div>
 
@@ -308,15 +300,14 @@ function ProductContent({ slug }: ProductContentProps) {
               className="continue-shopping-button"
               to="/catalog"
             >
-              სხვა პროდუქტების ნახვა
-            </Link>
+              <LocalizedText k="auto.213" /> </Link>
           </section>
         </div>
 
         {/* Specifications */}
         {specifications.length > 0 && (
           <section className="product-specifications">
-            <h2>ტექნიკური მახასიათებლები</h2>
+            <h2><LocalizedText k="auto.214" /></h2>
 
             <div className="product-specifications-scroll">
               <table className="product-specifications-table">
@@ -324,11 +315,11 @@ function ProductContent({ slug }: ProductContentProps) {
                   {specifications.map(([key, value]) => (
                     <tr key={key}>
                       <th scope="row">
-                        {key}
+                        {localizedProductField(key)}
                       </th>
 
                       <td>
-                        {formatSpecValue(value)}
+                        {localizedProductField(value)}
                       </td>
                     </tr>
                   ))}
@@ -341,7 +332,7 @@ function ProductContent({ slug }: ProductContentProps) {
         {/* Related products */}
         {relatedProducts.length > 0 && (
           <section className="related-products">
-            <h2>მსგავსი პროდუქტები</h2>
+            <h2><LocalizedText k="auto.215" /></h2>
 
             <div className="related-products-grid">
               {relatedProducts.map((relatedProduct) => (
@@ -361,8 +352,7 @@ function ProductContent({ slug }: ProductContentProps) {
                       />
                     ) : (
                       <div className="product-details-placeholder">
-                        ფოტო არ არის
-                      </div>
+                        <LocalizedText k="auto.092" /> </div>
                     )}
                   </Link>
 
@@ -409,6 +399,7 @@ function ProductContent({ slug }: ProductContentProps) {
 }
 
 function ProductDetailsPage() {
+  useAtelierTranslation()
   const { slug } = useParams<{ slug: string }>()
 
   if (!slug) {
@@ -416,14 +407,13 @@ function ProductDetailsPage() {
       <main className="product-details-page">
         <div className="product-details-container">
           <div className="product-details-state">
-            <p>პროდუქტის მისამართი არასწორია</p>
+            <p><LocalizedText k="auto.216" /></p>
 
             <Link
               className="back-to-catalog-button"
               to="/catalog"
             >
-              კატალოგში დაბრუნება
-            </Link>
+              <LocalizedText k="auto.195" /> </Link>
           </div>
         </div>
       </main>

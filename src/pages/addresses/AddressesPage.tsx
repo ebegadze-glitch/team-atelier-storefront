@@ -1,3 +1,4 @@
+import LocalizedText from '../../shared/i18n/LocalizedText'
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -139,12 +140,11 @@ export default function AddressesPage() {
     <main className="addresses-page">
       <div className="addresses-container">
         <Link to="/profile" className="addresses-back">
-          ← პროფილზე დაბრუნება
-        </Link>
+          <LocalizedText k="auto.069" /> </Link>
 
         <header className="addresses-heading">
-          <h1>ჩემი მისამართები</h1>
-          <p>დაამატე და მართე მიწოდების მისამართები.</p>
+          <h1><LocalizedText k="auto.070" /></h1>
+          <p><LocalizedText k="auto.071" /></p>
         </header>
 
         {error && <Alert variant="error">{error}</Alert>}
@@ -159,13 +159,12 @@ export default function AddressesPage() {
               setFormMode({ type: 'create' })
             }}
           >
-            + მისამართის დამატება
-          </Button>
+            <LocalizedText k="auto.072" /> </Button>
         )}
 
         {formMode.type === 'create' && (
           <section className="addresses-form-card">
-            <h2>ახალი მისამართი</h2>
+            <h2><LocalizedText k="auto.073" /></h2>
 
             <AddressForm
               key="create"
@@ -180,7 +179,7 @@ export default function AddressesPage() {
 
         {formMode.type === 'edit' && (
           <section className="addresses-form-card">
-            <h2>მისამართის რედაქტირება</h2>
+            <h2><LocalizedText k="auto.074" /></h2>
 
             <AddressForm
               key={formMode.address.id}
@@ -194,11 +193,11 @@ export default function AddressesPage() {
           </section>
         )}
 
-        {isLoading && <p>მისამართები იტვირთება...</p>}
+        {isLoading && <p><LocalizedText k="auto.075" /></p>}
 
         {!isLoading && addresses.length === 0 && (
           <div className="addresses-empty">
-            <p>მისამართები ჯერ არ გაქვს დამატებული.</p>
+            <p><LocalizedText k="auto.076" /></p>
           </div>
         )}
 
@@ -221,8 +220,7 @@ export default function AddressesPage() {
 
         {!isLoading && addresses.length >= 10 && (
           <p className="addresses-limit">
-            შესაძლებელია მაქსიმუმ 10 მისამართის შენახვა.
-          </p>
+            <LocalizedText k="auto.008" /> </p>
         )}
       </div>
     </main>

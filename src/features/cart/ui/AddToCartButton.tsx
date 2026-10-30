@@ -1,3 +1,5 @@
+import i18n from '../../../shared/i18n/index'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -21,6 +23,7 @@ export function AddToCartButton({
   qty = 1,
   className,
 }: AddToCartButtonProps) {
+  useAtelierTranslation()
   const { status } = useAuth()
   const { addItem, isMutating, isLoading } = useCart()
 
@@ -64,7 +67,7 @@ export function AddToCartButton({
 
     try {
       await addItem(productId, qty)
-      setMessage('პროდუქტი დაემატა კალათაში.')
+      setMessage(i18n.t("auto.044"))
     } catch (caughtError: unknown) {
       if (
         isApiError(caughtError) &&
@@ -89,7 +92,7 @@ export function AddToCartButton({
       setError(
         cartErrorText(
           caughtError,
-          'პროდუქტის დამატება ვერ მოხერხდა.',
+          i18n.t("auto.045"),
         ),
       )
     } finally {
@@ -104,13 +107,13 @@ export function AddToCartButton({
         className={className ?? 'add-to-cart-button'}
         onClick={() => void handleAddToCart()}
         disabled={isDisabled}
-        aria-label="კალათაში დამატება"
+        aria-label={i18n.t("auto.046")}
       >
         {isOutOfStock
-          ? 'არ არის მარაგში'
+          ? i18n.t("auto.047")
           : isSubmitting
-            ? 'ემატება...'
-            : 'კალათაში დამატება'}
+            ? i18n.t("auto.048")
+            : i18n.t("auto.046")}
       </button>
 
       {message && (

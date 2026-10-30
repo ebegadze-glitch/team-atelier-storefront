@@ -1,3 +1,6 @@
+import i18n from '../../shared/i18n/index'
+import { useTranslation } from 'react-i18next'
+import { localizeValidationError } from '../../shared/i18n/authValidation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -44,6 +47,7 @@ type Step = 'email' | 'code' | 'password' | 'success'
 
 
 function ForgotPasswordPage() {
+  const { t } = useTranslation()
   const [step, setStep] = useState<Step>('email')
   const [email, setEmail] = useState('')
   const [resetToken, setResetToken] = useState('')
@@ -75,12 +79,12 @@ function ForgotPasswordPage() {
       setStep('code')
     } catch (error: unknown) {
       if (!isApiError(error)) {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('auth.generalError'))
         return
       }
 
       if (error.code === 'NETWORK_ERROR') {
-        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        setFormError(i18n.t("auto.010"))
         return
       }
 
@@ -101,26 +105,26 @@ function ForgotPasswordPage() {
       setStep('password')
     } catch (error: unknown) {
       if (!isApiError(error)) {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('auth.generalError'))
         return
       }
 
       if (error.code === 'INVALID_RESET_CODE') {
         codeForm.setError('code', {
-          message: 'კოდი არასწორია ან ვადაგასულია',
+          message: t('auth.invalidCode'),
         })
         return
       }
 
       if (error.code === 'TOO_MANY_ATTEMPTS') {
         setFormError(
-          'ძალიან ბევრი მცდელობა. მოითხოვე ახალი კოდი.',
+          i18n.t("auto.077"),
         )
         return
       }
 
       if (error.code === 'NETWORK_ERROR') {
-        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        setFormError(i18n.t("auto.010"))
         return
       }
 
@@ -143,12 +147,12 @@ function ForgotPasswordPage() {
       setStep('success')
     } catch (error: unknown) {
       if (!isApiError(error)) {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('auth.generalError'))
         return
       }
 
       if (error.code === 'NETWORK_ERROR') {
-        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        setFormError(i18n.t("auto.010"))
         return
       }
 
@@ -172,7 +176,7 @@ function ForgotPasswordPage() {
         <p className="forgot-brand">ATELIER</p>
 
         <h1 className="forgot-title" id="forgot-title">
-          Reset your password
+          {t('forgot.title')}
         </h1>
 
         {formError && (
@@ -184,7 +188,7 @@ function ForgotPasswordPage() {
         {step === 'email' && (
           <>
             <p className="forgot-subtitle">
-              Enter your email to request a reset code.
+              {t('forgot.subtitle')}
             </p>
 
             <form
@@ -195,9 +199,9 @@ function ForgotPasswordPage() {
               noValidate
             >
               <FormField
-                label="Email"
+                label={t('reg.email')}
                 htmlFor="email"
-                error={emailForm.formState.errors.email?.message}
+                error={localizeValidationError(emailForm.formState.errors.email?.message)}
                 errorId="email-error"
               >
                 <Input
@@ -222,7 +226,7 @@ function ForgotPasswordPage() {
                 isLoading={emailForm.formState.isSubmitting}
                 disabled={emailForm.formState.isSubmitting}
               >
-                Send reset code
+                {t('forgot.send')}
               </Button>
             </form>
           </>
@@ -231,7 +235,7 @@ function ForgotPasswordPage() {
         {step === 'code' && (
           <>
             <p className="forgot-subtitle">
-              Enter the reset code sent for {email}.
+              {t('forgot.codeSubtitle', { email })}
             </p>
 
             <form
@@ -242,9 +246,9 @@ function ForgotPasswordPage() {
               noValidate
             >
               <FormField
-                label="Reset code"
+                label={t('forgot.code')}
                 htmlFor="reset-code"
-                error={codeForm.formState.errors.code?.message}
+                error={localizeValidationError(codeForm.formState.errors.code?.message)}
                 errorId="reset-code-error"
               >
                 <Input
@@ -269,7 +273,7 @@ function ForgotPasswordPage() {
                 isLoading={codeForm.formState.isSubmitting}
                 disabled={codeForm.formState.isSubmitting}
               >
-                Verify code
+                {t('forgot.verify')}
               </Button>
 
               <Button
@@ -277,7 +281,7 @@ function ForgotPasswordPage() {
                 onClick={requestNewCode}
                 disabled={codeForm.formState.isSubmitting}
               >
-                Request new code
+                {t('forgot.newCode')}
               </Button>
             </form>
           </>
@@ -286,7 +290,7 @@ function ForgotPasswordPage() {
         {step === 'password' && (
           <>
             <p className="forgot-subtitle">
-              Create your new password.
+              {t('forgot.newPasswordSubtitle')}
             </p>
 
             <form
@@ -297,11 +301,9 @@ function ForgotPasswordPage() {
               noValidate
             >
               <FormField
-                label="New password"
+                label={t('forgot.newPassword')}
                 htmlFor="new-password"
-                error={
-                  passwordForm.formState.errors.password?.message
-                }
+                error={localizeValidationError(passwordForm.formState.errors.password?.message)}
                 errorId="new-password-error"
               >
                 <PasswordInput
@@ -331,7 +333,7 @@ function ForgotPasswordPage() {
                   passwordForm.formState.isSubmitting
                 }
               >
-                Reset password
+                {t('forgot.reset')}
               </Button>
             </form>
           </>
@@ -339,17 +341,17 @@ function ForgotPasswordPage() {
 
         {step === 'success' && (
           <div className="forgot-success" role="status">
-            <p>Your password has been reset successfully.</p>
+            <p>{t('forgot.success')}</p>
 
             <Link className="forgot-back" to="/login">
-              Continue to login
+              {t('forgot.continue')}
             </Link>
           </div>
         )}
 
         {step !== 'success' && (
           <Link className="forgot-back" to="/login">
-            Back to login
+            {t('forgot.back')}
           </Link>
         )}
       </section>

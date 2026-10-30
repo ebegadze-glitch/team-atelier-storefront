@@ -1,3 +1,6 @@
+import i18n from '../../shared/i18n/index'
+import { useTranslation } from 'react-i18next'
+import { localizeValidationError } from '../../shared/i18n/authValidation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,6 +29,7 @@ import './RegisterPage.css'
 
 
 function RegisterPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { setAuthenticatedUser } = useAuth()
 
@@ -61,7 +65,7 @@ function RegisterPage() {
       tokenStorage.remove()
 
       if (!isApiError(error)) {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('auth.generalError'))
         return
       }
 
@@ -83,13 +87,13 @@ function RegisterPage() {
 
       if (error.code === 'EMAIL_TAKEN') {
         setError('email', {
-          message: 'ეს ელფოსტა უკვე რეგისტრირებულია',
+          message: t('auth.emailTaken'),
         })
         return
       }
 
       if (error.code === 'NETWORK_ERROR') {
-        setFormError('ქსელთან დაკავშირება ვერ მოხერხდა.')
+        setFormError(i18n.t("auto.010"))
         return
       }
 
@@ -106,11 +110,11 @@ function RegisterPage() {
         <p className="register-brand">ATELIER</p>
 
         <h1 id="register-title" className="register-title">
-          Create account
+          {t('reg.title')}
         </h1>
 
         <p className="register-subtitle">
-          Create your Atelier account.
+          {t('reg.subtitle')}
         </p>
 
         {formError && (
@@ -125,9 +129,9 @@ function RegisterPage() {
           noValidate
         >
           <FormField
-            label="Name"
+            label={t('reg.name')}
             htmlFor="name"
-            error={errors.name?.message}
+            error={localizeValidationError(errors.name?.message)}
             errorId="name-error"
           >
             <Input
@@ -143,9 +147,9 @@ function RegisterPage() {
           </FormField>
 
           <FormField
-            label="Email"
+            label={t('reg.email')}
             htmlFor="email"
-            error={errors.email?.message}
+            error={localizeValidationError(errors.email?.message)}
             errorId="email-error"
           >
             <Input
@@ -162,9 +166,9 @@ function RegisterPage() {
           </FormField>
 
           <FormField
-            label="Password"
+            label={t('reg.password')}
             htmlFor="password"
-            error={errors.password?.message}
+            error={localizeValidationError(errors.password?.message)}
             errorId="password-error"
           >
             <PasswordInput
@@ -180,9 +184,9 @@ function RegisterPage() {
           </FormField>
 
           <FormField
-            label="Confirm password"
+            label={t('reg.confirm')}
             htmlFor="confirmPassword"
-            error={errors.confirmPassword?.message}
+            error={localizeValidationError(errors.confirmPassword?.message)}
             errorId="confirm-password-error"
           >
             <PasswordInput
@@ -204,13 +208,13 @@ function RegisterPage() {
             isLoading={isSubmitting}
             disabled={isSubmitting}
           >
-            Create account
+            {t('reg.title')}
           </Button>
         </form>
 
         <p className="register-login">
-          Already have an account?{' '}
-          <Link to="/login">Sign in</Link>
+          {t('reg.have')}{' '}
+          <Link to="/login">{t('reg.signin')}</Link>
         </p>
       </section>
     </main>

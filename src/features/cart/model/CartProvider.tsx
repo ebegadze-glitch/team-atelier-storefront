@@ -1,3 +1,5 @@
+import i18n from '../../../shared/i18n/index'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import {
   useCallback,
@@ -37,6 +39,7 @@ const initialState: CartState = {
 export function CartProvider({
   children,
 }: CartProviderProps) {
+  useAtelierTranslation()
   const { status, user } = useAuth()
 
   const isAuthenticated =
@@ -65,6 +68,7 @@ function CartSession({
   userId,
   children,
 }: CartSessionProps) {
+  useAtelierTranslation()
   const [state, setState] = useState<CartState>({
     ...initialState,
     isLoading: userId !== null,
@@ -142,7 +146,7 @@ function CartSession({
     ): Promise<void> => {
       if (userId === null) {
         throw new Error(
-          'კალათის შესაცვლელად საჭიროა ავტორიზაცია.',
+          i18n.t("auto.040"),
         )
       }
 
@@ -225,7 +229,7 @@ function CartSession({
         qty < 1 ||
         qty > 99
       ) {
-        throw new Error('პროდუქტის მონაცემები არასწორია.')
+        throw new Error(i18n.t("auto.041"))
       }
 
       await mutateCart(() =>
@@ -247,7 +251,7 @@ function CartSession({
         qty > 99
       ) {
         throw new Error(
-          'რაოდენობა უნდა იყოს 1-დან 99-მდე.',
+          i18n.t("auto.042"),
         )
       }
 
@@ -261,7 +265,7 @@ function CartSession({
   const removeItem = useCallback(
     async (lineId: string): Promise<void> => {
       if (!lineId.trim()) {
-        throw new Error('კალათის ჩანაწერის ID არასწორია.')
+        throw new Error(i18n.t("auto.043"))
       }
 
       await mutateCart(() =>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -77,6 +78,7 @@ function getReturnDestination(
 }
 
 function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -121,19 +123,19 @@ function LoginPage() {
 
       if (!isApiError(error)) {
         setFormError(
-          'Something went wrong. Please try again.',
+          t('login.unexpected'),
         )
         return
       }
 
       if (error.code === 'INVALID_CREDENTIALS') {
-        setFormError('Incorrect email or password.')
+        setFormError(t('login.badCredentials'))
         return
       }
 
       if (error.code === 'NETWORK_ERROR') {
         setFormError(
-          'ქსელთან დაკავშირება ვერ მოხერხდა.',
+          t('auto.010'),
         )
         return
       }
@@ -156,11 +158,11 @@ function LoginPage() {
           className="login-title"
           id="login-title"
         >
-          Welcome back
+          {t('login.welcome')}
         </h1>
 
         <p className="login-subtitle">
-          Sign in to continue to Atelier.
+          {t('login.subtitle')}
         </p>
 
         {formError && (
@@ -175,9 +177,9 @@ function LoginPage() {
           noValidate
         >
           <FormField
-            label="Email"
+            label={t('login.email')}
             htmlFor="email"
-            error={errors.email?.message}
+            error={errors.email ? t(errors.email.type === 'too_small' ? 'login.emailRequired' : 'login.emailInvalid') : undefined}
             errorId="email-error"
           >
             <Input
@@ -196,9 +198,9 @@ function LoginPage() {
           </FormField>
 
           <FormField
-            label="Password"
+            label={t('login.password')}
             htmlFor="password"
-            error={errors.password?.message}
+            error={errors.password ? t('login.passwordRequired') : undefined}
             errorId="password-error"
           >
             <PasswordInput
@@ -220,7 +222,7 @@ function LoginPage() {
             isLoading={isSubmitting}
             disabled={isSubmitting}
           >
-            Continue
+            {t('login.continue')}
           </Button>
         </form>
 
@@ -228,13 +230,13 @@ function LoginPage() {
           className="login-link"
           to="/forgot-password"
         >
-          Forgot password?
+          {t('login.forgot')}
         </Link>
 
         <p className="login-register">
-          New to Atelier?{' '}
+          {t('login.new')}{' '}
           <Link to="/register">
-            Create account
+            {t('login.create')}
           </Link>
         </p>
       </section>

@@ -1,3 +1,6 @@
+import i18n from '../../shared/i18n/index'
+import LocalizedText from '../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -44,10 +47,11 @@ function getProductTitle(item: OrderItem): string {
     return item.product.title
   }
 
-  return 'პროდუქტი'
+  return i18n.t("auto.050")
 }
 
 export default function OrderDetailsPage() {
+  useAtelierTranslation()
   const { orderId } = useParams<{ orderId: string }>()
   const navigate = useNavigate()
 
@@ -108,18 +112,17 @@ export default function OrderDetailsPage() {
     <main className="checkout-page">
       <div className="checkout-wrap checkout-confirm-wrap">
         <Link to="/home" className="checkout-back">
-          ← მთავარ გვერდზე დაბრუნება
-        </Link>
+          <LocalizedText k="auto.175" /> </Link>
 
         <section className="checkout-panel checkout-confirm">
           {loading && orderId ? (
-            <p role="status">შეკვეთა იტვირთება...</p>
+            <p role="status"><LocalizedText k="auto.176" /></p>
           ) : error || !order || !orderId ? (
             <>
-              <h1>შეკვეთა ვერ ჩაიტვირთა</h1>
+              <h1><LocalizedText k="auto.177" /></h1>
 
               <p role="alert">
-                {error ?? 'შეკვეთის ნომერი არასწორია.'}
+                {error ?? i18n.t("auto.178")}
               </p>
 
               <button
@@ -127,8 +130,7 @@ export default function OrderDetailsPage() {
                 className="checkout-primary"
                 onClick={() => window.location.reload()}
               >
-                ხელახლა ცდა
-              </button>
+                <LocalizedText k="auto.083" /> </button>
             </>
           ) : (
             <>
@@ -145,31 +147,31 @@ export default function OrderDetailsPage() {
 
               <h1>
                 {isPaid
-                  ? 'მადლობა! შეკვეთა გადახდილია'
-                  : 'შეკვეთის დეტალები'}
+                  ? i18n.t("auto.179")
+                  : i18n.t("auto.180")}
               </h1>
 
               <p>
-                შეკვეთა № <strong>{orderNumber}</strong>
+                <LocalizedText k="auto.181" /> <strong>{orderNumber}</strong>
               </p>
 
               {order.status && (
                 <p>
-                  სტატუსი:{' '}
+                  <LocalizedText k="auto.182" />{' '}
                   <strong>
-                    {isPaid ? 'გადახდილია' : order.status}
+                    {isPaid ? i18n.t("auto.183") : order.status}
                   </strong>
                 </p>
               )}
 
               {order.createdAt && (
-                <p>თარიღი: {formatDate(order.createdAt)}</p>
+                <p><LocalizedText k="auto.184" /> {formatDate(order.createdAt)}</p>
               )}
 
               {Array.isArray(order.items) &&
                 order.items.length > 0 && (
                   <div className="checkout-order-items">
-                    <h2>შეკვეთილი პროდუქტები</h2>
+                    <h2><LocalizedText k="auto.185" /></h2>
 
                     {order.items.map((item, index) => (
                       <div
@@ -193,7 +195,7 @@ export default function OrderDetailsPage() {
 
               {typeof order.total === 'number' && (
                 <div className="checkout-money-row checkout-money-total">
-                  <span>სულ</span>
+                  <span><LocalizedText k="auto.102" /></span>
 
                   <strong>
                     {formatMoney(
@@ -206,7 +208,7 @@ export default function OrderDetailsPage() {
 
               {order.shipping && (
                 <div className="checkout-order-items">
-                  <h2>მიწოდების მისამართი</h2>
+                  <h2><LocalizedText k="auto.186" /></h2>
 
                   <p>{order.shipping.fullName}</p>
                   <p>{order.shipping.phone}</p>
@@ -218,9 +220,9 @@ export default function OrderDetailsPage() {
 
               {order.payment && (
                 <div className="checkout-order-items">
-                  <h2>გადახდა</h2>
+                  <h2><LocalizedText k="auto.187" /></h2>
                   <p>
-                    {order.payment.brand ?? 'ბარათი'}
+                    {order.payment.brand ?? i18n.t("auto.188")}
                     {' •••• '}
                     {order.payment.last4 ?? '••••'}
                   </p>
@@ -231,8 +233,7 @@ export default function OrderDetailsPage() {
                 className="checkout-primary checkout-link-primary"
                 to="/catalog"
               >
-                შოპინგის გაგრძელება →
-              </Link>
+                <LocalizedText k="auto.189" /> </Link>
             </>
           )}
         </section>

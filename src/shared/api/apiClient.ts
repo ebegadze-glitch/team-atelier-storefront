@@ -1,3 +1,4 @@
+import i18n from '../i18n/index'
 
 import { tokenStorage } from '../../features/auth/model/tokenStorage'
 
@@ -51,7 +52,7 @@ function getApiError(data: unknown): ApiError {
     message:
       typeof body.message === 'string'
         ? body.message
-        : 'მოთხოვნის შესრულება ვერ მოხერხდა.',
+        : i18n.t("auto.230"),
     code:
       typeof body.code === 'string'
         ? body.code
@@ -125,7 +126,7 @@ export async function apiClient<T>(
     }
 
     throw {
-      message: 'ქსელთან დაკავშირება ვერ მოხერხდა.',
+      message: i18n.t("auto.010"),
       code: 'NETWORK_ERROR',
     } satisfies ApiError
   }

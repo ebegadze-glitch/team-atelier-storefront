@@ -1,3 +1,4 @@
+import i18n from '../../../shared/i18n/index'
 import { z } from 'zod'
 
 /** The browser formats card input; only digits go to the backend. */
@@ -40,19 +41,19 @@ export function isFutureExpiry(value: string): boolean {
 }
 
 export const shippingSchema = z.object({
-  fullName: z.string().trim().min(2, 'შეიყვანე სახელი და გვარი (მინიმუმ 2 სიმბოლო)'),
-  phone: z.string().trim().min(9, 'ნომერი უნდა იყოს მინიმუმ 9 სიმბოლო').max(20, 'ნომერი არ უნდა აღემატებოდეს 20 სიმბოლოს'),
-  city: z.string().trim().min(1, 'მიუთითე ქალაქი'),
-  address: z.string().trim().min(5, 'მისამართი უნდა იყოს მინიმუმ 5 სიმბოლო'),
+  fullName: z.string().trim().min(2, i18n.t("auto.051")),
+  phone: z.string().trim().min(9, i18n.t("auto.052")).max(20, i18n.t("auto.053")),
+  city: z.string().trim().min(1, i18n.t("auto.054")),
+  address: z.string().trim().min(5, i18n.t("auto.055")),
 })
 
 export const checkoutSchema = z.object({
   shipping: shippingSchema,
   card: z.object({
-    number: z.string().refine(passesLuhn, 'ბარათის ნომერი არასწორია'),
-    holder: z.string().trim().min(2, 'მიუთითე ბარათის მფლობელი'),
-    expiry: z.string().refine(isFutureExpiry, 'შეიყვანე მოქმედი ვადა MM/YY'),
-    cvc: z.string().regex(/^\d{3,4}$/, 'CVC უნდა შეიცავდეს 3 ან 4 ციფრს'),
+    number: z.string().refine(passesLuhn, i18n.t("auto.056")),
+    holder: z.string().trim().min(2, i18n.t("auto.057")),
+    expiry: z.string().refine(isFutureExpiry, i18n.t("auto.058")),
+    cvc: z.string().regex(/^\d{3,4}$/, i18n.t("auto.059")),
   }),
 })
 

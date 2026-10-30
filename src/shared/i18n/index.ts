@@ -1,45 +1,17 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import ka from './locales/ka.json'
+import en from './locales/en.json'
 
 const savedLanguage = localStorage.getItem('atelier-language')
 const language = savedLanguage === 'en' ? 'en' : 'ka'
 
 void i18n.use(initReactI18next).init({
-  resources: {
-    ka: {
-      translation: {
-        home: 'მთავარი',
-        catalog: 'კატალოგი',
-        cart: 'კალათა',
-        profile: 'პროფილი',
-        login: 'შესვლა',
-        register: 'რეგისტრაცია',
-        logout: 'გასვლა',
-        checkout: 'შეკვეთის გაფორმება',
-        language: 'ენა',
-        wishlist: 'სურვილები',
-      },
-    },
-    en: {
-      translation: {
-        home: 'Home',
-        catalog: 'Catalog',
-        cart: 'Cart',
-        profile: 'Profile',
-        login: 'Login',
-        register: 'Register',
-        logout: 'Logout',
-        checkout: 'Checkout',
-        language: 'Language',
-        wishlist: 'Wishlist',
-      },
-    },
-  },
+  resources: { ka: { translation: ka }, en: { translation: en } },
   lng: language,
   fallbackLng: 'ka',
-  interpolation: {
-    escapeValue: false,
-  },
+  keySeparator: false,
+  interpolation: { escapeValue: false },
 })
 
 export default i18n

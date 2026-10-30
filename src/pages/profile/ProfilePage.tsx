@@ -1,3 +1,6 @@
+import i18n from '../../shared/i18n/index'
+import LocalizedText from '../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -34,6 +37,7 @@ const profileFields = [
 
 
 export default function ProfilePage() {
+  useAtelierTranslation()
   const { user, setAuthenticatedUser } = useAuth()
 
   const [formError, setFormError] = useState<string | null>(
@@ -124,11 +128,11 @@ export default function ProfilePage() {
         confirmNewPassword: '',
       })
 
-      setSuccessMessage('ცვლილებები შენახულია')
+      setSuccessMessage(i18n.t("auto.217"))
     } catch (error: unknown) {
       if (!isApiError(error)) {
         setFormError(
-          'დაფიქსირდა შეცდომა. სცადე ხელახლა.',
+          i18n.t("auto.007"),
         )
         return
       }
@@ -180,7 +184,7 @@ export default function ProfilePage() {
 
       if (error.code === 'NETWORK_ERROR') {
         setFormError(
-          'ქსელთან დაკავშირება ვერ მოხერხდა.',
+          i18n.t("auto.010"),
         )
         return
       }
@@ -193,19 +197,16 @@ export default function ProfilePage() {
     <main className="profile-page">
       <div className="profile-container">
         <Link to="/home">
-          ← მთავარზე დაბრუნება
-        </Link>
+          <LocalizedText k="auto.218" /> </Link>
 
-        <h1>ჩემი პროფილი</h1>
+        <h1><LocalizedText k="auto.219" /></h1>
 
         <p>
-          შეცვალე ანგარიშის მონაცემები და პაროლი.
-        </p>
+          <LocalizedText k="auto.220" /> </p>
 
-        <nav aria-label="პროფილის მენიუ">
+        <nav aria-label={i18n.t("auto.221")}>
           <Link to="/addresses">
-            ჩემი მისამართები →
-          </Link>
+            <LocalizedText k="auto.222" /> </Link>
         </nav>
 
         {formError && (
@@ -225,7 +226,7 @@ export default function ProfilePage() {
           noValidate
         >
           <FormField
-            label="სახელი"
+            label={i18n.t("auto.223")}
             htmlFor="profile-name"
             error={errors.name?.message}
             errorId="profile-name-error"
@@ -245,7 +246,7 @@ export default function ProfilePage() {
           </FormField>
 
           <FormField
-            label="ელფოსტა"
+            label={i18n.t("auto.224")}
             htmlFor="profile-email"
             error={errors.email?.message}
             errorId="profile-email-error"
@@ -266,7 +267,7 @@ export default function ProfilePage() {
           </FormField>
 
           <FormField
-            label="მიმდინარე პაროლი"
+            label={i18n.t("auto.225")}
             htmlFor="profile-current-password"
             error={errors.currentPassword?.message}
             errorId="profile-current-password-error"
@@ -288,7 +289,7 @@ export default function ProfilePage() {
           </FormField>
 
           <FormField
-            label="ახალი პაროლი (არასავალდებულო)"
+            label={i18n.t("auto.226")}
             htmlFor="profile-new-password"
             error={errors.newPassword?.message}
             errorId="profile-new-password-error"
@@ -310,7 +311,7 @@ export default function ProfilePage() {
           </FormField>
 
           <FormField
-            label="გაიმეორე ახალი პაროლი"
+            label={i18n.t("auto.227")}
             htmlFor="profile-confirm-password"
             error={errors.confirmNewPassword?.message}
             errorId="profile-confirm-password-error"
@@ -336,8 +337,7 @@ export default function ProfilePage() {
             isLoading={isSubmitting}
             disabled={!hasChanges || isSubmitting}
           >
-            ცვლილებების შენახვა
-          </Button>
+            <LocalizedText k="auto.228" /> </Button>
         </form>
       </div>
     </main>

@@ -1,3 +1,7 @@
+import i18n from '../../shared/i18n/index'
+import LocalizedText from '../../shared/i18n/LocalizedText'
+import { localizedCatalogText } from '../../shared/i18n/productFields'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import {
   useCallback,
@@ -50,11 +54,12 @@ const COLOR_MAP: Record<string, string> = {
 // ========================================
 
 function ProductSkeletons() {
+  useAtelierTranslation()
   return (
     <div
       className="product-grid"
       role="status"
-      aria-label="პროდუქტები იტვირთება"
+      aria-label={i18n.t("auto.106")}
     >
       {Array.from({ length: 12 }, (_, index) => (
         <div
@@ -88,6 +93,7 @@ function SearchBox({
   initialValue,
   onSearchChange,
 }: SearchBoxProps) {
+  useAtelierTranslation()
   const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
@@ -105,14 +111,13 @@ function SearchBox({
   return (
     <div className="catalog-search">
       <label htmlFor="catalog-search">
-        ძებნა
-      </label>
+        <LocalizedText k="auto.107" /> </label>
 
       <input
         id="catalog-search"
         type="search"
         value={value}
-        placeholder="მოძებნე პროდუქტი..."
+        placeholder={i18n.t("auto.108")}
         onChange={(event) => {
           setValue(event.target.value)
         }}
@@ -141,6 +146,7 @@ function PriceRange({
   maxPrice,
   onPriceChange,
 }: PriceRangeProps) {
+  useAtelierTranslation()
   const [minDraft, setMinDraft] = useState(minPrice)
   const [maxDraft, setMaxDraft] = useState(maxPrice)
 
@@ -249,11 +255,11 @@ function PriceRange({
 
   return (
     <section className="filter-group">
-      <h3>{filter.label}</h3>
+      <h3>{localizedCatalogText(filter.label)}</h3>
 
       <div className="price-inputs">
         <label>
-          <span>მინ.</span>
+          <span><LocalizedText k="auto.109" /></span>
 
           <input
             type="number"
@@ -268,7 +274,7 @@ function PriceRange({
         </label>
 
         <label>
-          <span>მაქს.</span>
+          <span><LocalizedText k="auto.110" /></span>
 
           <input
             type="number"
@@ -290,7 +296,7 @@ function PriceRange({
       {hasSlider && (
         <div className="price-sliders">
           <label className="price-slider-label">
-            <span>მინიმალური ფასი</span>
+            <span><LocalizedText k="auto.111" /></span>
 
             <strong>
               {minNumber} {unit}
@@ -300,7 +306,7 @@ function PriceRange({
           <input
             type="range"
             className="price-slider"
-            aria-label="მინიმალური ფასი"
+            aria-label={i18n.t("auto.111")}
             min={lowerBound}
             max={upperBound}
             step={1}
@@ -312,7 +318,7 @@ function PriceRange({
           />
 
           <label className="price-slider-label">
-            <span>მაქსიმალური ფასი</span>
+            <span><LocalizedText k="auto.112" /></span>
 
             <strong>
               {maxNumber} {unit}
@@ -322,7 +328,7 @@ function PriceRange({
           <input
             type="range"
             className="price-slider"
-            aria-label="მაქსიმალური ფასი"
+            aria-label={i18n.t("auto.112")}
             min={lowerBound}
             max={upperBound}
             step={1}
@@ -340,16 +346,14 @@ function PriceRange({
           className="price-range-error"
           role="alert"
         >
-          მინიმალური ფასი მაქსიმალურზე მეტი
-          ვერ იქნება.
-        </p>
+          <LocalizedText k="auto.113" /> </p>
       )}
 
       <small className="price-range-hint">
         {filter.min ?? 0}
         {filter.max !== undefined
           ? ` – ${filter.max}`
-          : ' და მეტი'}{' '}
+          : i18n.t("auto.114")}{' '}
         {unit}
       </small>
     </section>
@@ -361,6 +365,7 @@ function PriceRange({
 // ========================================
 
 export default function CatalogPage() {
+  useAtelierTranslation()
   const [searchParams, setSearchParams] =
     useSearchParams()
 
@@ -431,7 +436,7 @@ export default function CatalogPage() {
       .catch(() => {
         if (active) {
           setCategoryError(
-            'კატეგორია ვერ ჩაიტვირთა',
+            i18n.t("auto.115"),
           )
         }
       })
@@ -510,7 +515,7 @@ export default function CatalogPage() {
         }
 
         setError(
-          'პროდუქტები ვერ ჩაიტვირთა',
+          i18n.t("auto.116"),
         )
       } finally {
         if (!controller.signal.aborted) {
@@ -741,7 +746,7 @@ export default function CatalogPage() {
         key={filter.key}
         className="filter-group"
       >
-        <h3>{filter.label}</h3>
+        <h3>{localizedCatalogText(filter.label)}</h3>
 
         <div className="filter-options">
           {filter.options?.map((option) => (
@@ -802,7 +807,7 @@ export default function CatalogPage() {
               )}
 
               <span>
-                {option.label}
+                {localizedCatalogText(option.label)}
               </span>
             </label>
           ))}
@@ -818,8 +823,7 @@ export default function CatalogPage() {
                 })
               }}
             >
-              ამ ფილტრის მოხსნა
-            </button>
+              <LocalizedText k="auto.117" /> </button>
           )}
       </section>
     )
@@ -855,21 +859,19 @@ export default function CatalogPage() {
               className="catalog-top-link"
               to="/home"
             >
-              ← მთავარი გვერდი
-            </Link>
+              <LocalizedText k="auto.079" /> </Link>
 
             <Link
               className="catalog-top-link catalog-cart-link"
               to="/cart"
               aria-label={
                 isCartLoading
-                  ? 'კალათა იტვირთება'
+                  ? i18n.t("auto.064")
                   : `კალათა: ${cartQuantity} ერთეული`
               }
             >
               <ShoppingBag size={19} strokeWidth={1.8} aria-hidden="true" />
-              კალათა
-              {!isCartLoading && (
+              <LocalizedText k="auto.118" /> {!isCartLoading && (
                 <span>
                   {' '}({cartQuantity})
                 </span>
@@ -884,8 +886,8 @@ export default function CatalogPage() {
           <h1>
 
 {selectedFurniture
-  ? selectedFurniture.name
-  : (category?.name ?? 'კატალოგი')}
+  ? (i18n.language === "en" ? selectedFurniture.en : selectedFurniture.name)
+  : (i18n.language === "en" ? category?.nameEn || (category?.name ? localizedCatalogText(category.name) : undefined) : category?.name) ?? i18n.t("auto.119")}
 
           </h1>
 
@@ -893,7 +895,7 @@ export default function CatalogPage() {
 
 {!selectedFurniture && category?.description ? (
   <p className="catalog-description">
-    {category.description}
+    {localizedCatalogText(category.description)}
   </p>
 ) : null}
 
@@ -910,8 +912,7 @@ export default function CatalogPage() {
 
           <div className="catalog-sort">
             <label htmlFor="catalog-sort">
-              სორტირება
-            </label>
+              <LocalizedText k="auto.120" /> </label>
 
             <select
               id="catalog-sort"
@@ -919,25 +920,25 @@ export default function CatalogPage() {
               onChange={handleSortChange}
             >
               <option value="newest">
-                Newest
+                <LocalizedText k="sort.newest" />
               </option>
               <option value="oldest">
-                Oldest
+                <LocalizedText k="sort.oldest" />
               </option>
               <option value="price-asc">
-                Price: low to high
+                <LocalizedText k="sort.priceAsc" />
               </option>
               <option value="price-desc">
-                Price: high to low
+                <LocalizedText k="sort.priceDesc" />
               </option>
               <option value="rating-desc">
-                Rating
+                <LocalizedText k="sort.rating" />
               </option>
               <option value="popular">
-                Popular
+                <LocalizedText k="sort.popular" />
               </option>
               <option value="title-asc">
-                Title A-Z
+                <LocalizedText k="sort.title" />
               </option>
             </select>
           </div>
@@ -947,15 +948,14 @@ export default function CatalogPage() {
           {/* FILTER SIDEBAR */}
           <aside className="catalog-sidebar">
             <div className="filters-header">
-              <h2>ფილტრები</h2>
+              <h2><LocalizedText k="auto.121" /></h2>
 
               <button
                 type="button"
                 className="clear-filters-button"
                 onClick={handleClearAll}
               >
-                გასუფთავება
-              </button>
+                <LocalizedText k="auto.122" /> </button>
             </div>
 
             {categoryError && (
@@ -973,15 +973,12 @@ export default function CatalogPage() {
           <section className="catalog-results">
             <div className="results-header">
               <p>
-                სულ{' '}
-                {isFetching ? '...' : total}{' '}
-                პროდუქტი
-              </p>
+                <LocalizedText k="auto.102" />{' '}
+                {isFetching ? '...' : i18n.t("fix.productCount", { count: total })} </p>
 
               {isFetching && (
                 <span role="status">
-                  იტვირთება...
-                </span>
+                  <LocalizedText k="auto.123" /> </span>
               )}
             </div>
 
@@ -1002,21 +999,18 @@ export default function CatalogPage() {
                     )
                   }}
                 >
-                  ხელახლა ცდა
-                </button>
+                  <LocalizedText k="auto.083" /> </button>
               </div>
             ) : products.length === 0 ? (
               <div className="catalog-state">
                 <p>
-                  ვერაფერი მოიძებნა
-                </p>
+                  <LocalizedText k="auto.124" /> </p>
 
                 <button
                   type="button"
                   onClick={handleClearAll}
                 >
-                  ფილტრების გასუფთავება
-                </button>
+                  <LocalizedText k="auto.125" /> </button>
               </div>
             ) : (
               <>
@@ -1097,10 +1091,10 @@ export default function CatalogPage() {
                           }
                         >
                           {product.inStock === true
-                            ? 'მარაგშია'
+                            ? i18n.t("auto.126")
                             : product.inStock === false
-                              ? 'არ არის მარაგში'
-                              : 'მარაგი უცნობია'}
+                              ? i18n.t("auto.047")
+                              : i18n.t("auto.127")}
                         </p>
 
                         {/* FE-005 ADD TO CART */}
@@ -1117,9 +1111,7 @@ export default function CatalogPage() {
                 {/* PAGINATION */}
                 <div className="pagination-section">
                   <p>
-                    ნაჩვენებია{' '}
-                    {firstVisible}–{lastVisible},
-                    სულ {total}
+                    {i18n.t('catalog.showing', { from: firstVisible, to: lastVisible, total })}
                   </p>
 
                   <div className="pagination-controls">
@@ -1130,11 +1122,10 @@ export default function CatalogPage() {
                       }}
                       disabled={page <= 1}
                     >
-                      წინა
-                    </button>
+                      <LocalizedText k="auto.130" /> </button>
 
                     <span>
-                      გვერდი {page} / {totalPages}
+                      <LocalizedText k="auto.131" /> {page} / {totalPages}
                     </span>
 
                     <button
@@ -1144,8 +1135,7 @@ export default function CatalogPage() {
                       }}
                       disabled={page >= totalPages}
                     >
-                      შემდეგი
-                    </button>
+                      <LocalizedText k="auto.132" /> </button>
                   </div>
                 </div>
               </>

@@ -1,3 +1,6 @@
+import i18n from '../../../shared/i18n/index'
+import LocalizedText from '../../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import type { Address } from '../api/addressesApi'
 import Button from '../../../shared/ui/Button'
@@ -17,30 +20,30 @@ export default function AddressCard({
   onSetDefault,
   onDelete,
 }: AddressCardProps) {
+  useAtelierTranslation()
   return (
     <article className="address-card">
       <div className="address-card-header">
-        <h2>{address.label || 'მისამართი'}</h2>
+        <h2>{address.label || i18n.t("auto.016")}</h2>
 
         {address.isDefault && (
           <span className="address-default-badge">
-            ძირითადი მისამართი
-          </span>
+            <LocalizedText k="auto.017" /> </span>
         )}
       </div>
 
       <div className="address-card-details">
         <p>
-          <strong>მიმღები:</strong> {address.fullName}
+          <strong><LocalizedText k="auto.018" /></strong> {address.fullName}
         </p>
         <p>
-          <strong>ტელეფონი:</strong> {address.phone}
+          <strong><LocalizedText k="auto.019" /></strong> {address.phone}
         </p>
         <p>
-          <strong>ქალაქი:</strong> {address.city}
+          <strong><LocalizedText k="auto.020" /></strong> {address.city}
         </p>
         <p>
-          <strong>მისამართი:</strong> {address.address}
+          <strong><LocalizedText k="auto.021" /></strong> {address.address}
         </p>
       </div>
 
@@ -51,8 +54,7 @@ export default function AddressCard({
           disabled={disabled}
           onClick={() => onEdit(address)}
         >
-          რედაქტირება
-        </Button>
+          <LocalizedText k="auto.022" /> </Button>
 
         {!address.isDefault && (
           <Button
@@ -61,8 +63,7 @@ export default function AddressCard({
             disabled={disabled}
             onClick={() => onSetDefault(address)}
           >
-            ძირითადად მონიშვნა
-          </Button>
+            <LocalizedText k="auto.023" /> </Button>
         )}
 
         <Button
@@ -71,8 +72,7 @@ export default function AddressCard({
           disabled={disabled}
           onClick={() => onDelete(address)}
         >
-          წაშლა
-        </Button>
+          <LocalizedText k="auto.024" /> </Button>
       </div>
     </article>
   )

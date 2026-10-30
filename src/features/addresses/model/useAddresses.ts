@@ -1,3 +1,4 @@
+import i18n from '../../../shared/i18n/index'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -20,17 +21,17 @@ function getAddressErrorMessage(error: unknown): string {
     !('code' in error) ||
     !('message' in error)
   ) {
-    return 'დაფიქსირდა შეცდომა. სცადე ხელახლა.'
+    return i18n.t("auto.007")
   }
 
   const apiError = error as ApiError
 
   switch (apiError.code) {
     case 'ADDRESS_LIMIT_REACHED':
-      return 'შესაძლებელია მაქსიმუმ 10 მისამართის შენახვა.'
+      return i18n.t("auto.008")
 
     case 'ADDRESS_NOT_FOUND':
-      return 'მისამართი ვერ მოიძებნა. განაახლე გვერდი.'
+      return i18n.t("auto.009")
 
     case 'VALIDATION_ERROR':
       return (
@@ -39,7 +40,7 @@ function getAddressErrorMessage(error: unknown): string {
       )
 
     case 'NETWORK_ERROR':
-      return 'ქსელთან დაკავშირება ვერ მოხერხდა.'
+      return i18n.t("auto.010")
 
     default:
       return apiError.message
@@ -132,7 +133,7 @@ export function useAddresses() {
         } catch (refreshError: unknown) {
           if (mountedRef.current) {
             setError(
-              'ცვლილება შესრულდა, მაგრამ სიის განახლება ვერ მოხერხდა. ' +
+              i18n.t("auto.011") +
                 getAddressErrorMessage(refreshError),
             )
           }
@@ -161,7 +162,7 @@ export function useAddresses() {
     (payload: AddressInput): Promise<boolean> =>
       runMutation(
         () => createAddress(payload),
-        'მისამართი წარმატებით დაემატა.',
+        i18n.t("auto.012"),
       ),
     [runMutation],
   )
@@ -177,7 +178,7 @@ export function useAddresses() {
 
       return runMutation(
         () => updateAddress(id, changes),
-        'მისამართი წარმატებით განახლდა.',
+        i18n.t("auto.013"),
       )
     },
     [runMutation],
@@ -187,7 +188,7 @@ export function useAddresses() {
     (id: string): Promise<boolean> =>
       runMutation(
         () => updateAddress(id, { isDefault: true }),
-        'ძირითადი მისამართი შეიცვალა.',
+        i18n.t("auto.014"),
       ),
     [runMutation],
   )
@@ -196,7 +197,7 @@ export function useAddresses() {
     (id: string): Promise<boolean> =>
       runMutation(
         () => deleteAddress(id),
-        'მისამართი წარმატებით წაიშალა.',
+        i18n.t("auto.015"),
       ),
     [runMutation],
   )

@@ -1,3 +1,4 @@
+import i18n from '../../shared/i18n/index'
 import { z } from 'zod'
 
 export const profileSchema = z
@@ -10,7 +11,7 @@ export const profileSchema = z
       .min(1, 'Email is required')
       .pipe(z.email('Enter a valid email address')),
 
-    currentPassword: z.string().refine((value) => value.trim().length > 0, 'შეიყვანე მიმდინარე პაროლი'),
+    currentPassword: z.string().refine((value) => value.trim().length > 0, i18n.t("auto.229")),
 
     newPassword: z.string(),
 

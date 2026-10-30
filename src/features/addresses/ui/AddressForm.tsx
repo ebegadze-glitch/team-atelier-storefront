@@ -1,3 +1,6 @@
+import i18n from '../../../shared/i18n/index'
+import LocalizedText from '../../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -22,6 +25,7 @@ export default function AddressForm({
   onSave,
   onCancel,
 }: AddressFormProps) {
+  useAtelierTranslation()
   const {
     register,
     handleSubmit,
@@ -41,14 +45,14 @@ export default function AddressForm({
   return (
     <form onSubmit={handleSubmit(onSave)} noValidate>
       <FormField
-        label="მისამართის დასახელება (არასავალდებულო)"
+        label={i18n.t("auto.025")}
         htmlFor="address-label"
         error={errors.label?.message}
         errorId="address-label-error"
       >
         <Input
           id="address-label"
-          placeholder="მაგალითად: სახლი"
+          placeholder={i18n.t("auto.026")}
           disabled={isSubmitting}
           aria-invalid={Boolean(errors.label)}
           aria-describedby={
@@ -59,7 +63,7 @@ export default function AddressForm({
       </FormField>
 
       <FormField
-        label="მიმღების სახელი და გვარი"
+        label={i18n.t("auto.027")}
         htmlFor="address-full-name"
         error={errors.fullName?.message}
         errorId="address-full-name-error"
@@ -78,7 +82,7 @@ export default function AddressForm({
       </FormField>
 
       <FormField
-        label="ტელეფონი"
+        label={i18n.t("auto.028")}
         htmlFor="address-phone"
         error={errors.phone?.message}
         errorId="address-phone-error"
@@ -96,7 +100,7 @@ export default function AddressForm({
       </FormField>
 
       <FormField
-        label="ქალაქი"
+        label={i18n.t("auto.029")}
         htmlFor="address-city"
         error={errors.city?.message}
         errorId="address-city-error"
@@ -113,7 +117,7 @@ export default function AddressForm({
       </FormField>
 
       <FormField
-        label="სრული მისამართი"
+        label={i18n.t("auto.030")}
         htmlFor="address-line"
         error={errors.address?.message}
         errorId="address-line-error"
@@ -135,13 +139,11 @@ export default function AddressForm({
           disabled={isSubmitting}
           {...register('isDefault')}
         />
-        {' '}ძირითად მისამართად მონიშვნა
-      </label>
+        {' '}<LocalizedText k="auto.031" /> </label>
 
       <div className="address-form-actions">
         <Button type="submit" isLoading={isSubmitting}>
-          შენახვა
-        </Button>
+          <LocalizedText k="auto.032" /> </Button>
 
         <Button
           type="button"
@@ -149,8 +151,7 @@ export default function AddressForm({
           disabled={isSubmitting}
           onClick={onCancel}
         >
-          გაუქმება
-        </Button>
+          <LocalizedText k="auto.033" /> </Button>
       </div>
     </form>
   )

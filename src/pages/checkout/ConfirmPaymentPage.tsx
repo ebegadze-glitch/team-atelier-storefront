@@ -1,3 +1,6 @@
+import i18n from '../../shared/i18n/index'
+import LocalizedText from '../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -38,6 +41,7 @@ function saveCooldown(key: string, until: number): void {
 }
 
 export default function ConfirmPaymentPage() {
+  useAtelierTranslation()
   const { orderId } = useParams<{ orderId: string }>()
   const navigate = useNavigate()
   const { refreshCart } = useCart()
@@ -171,7 +175,7 @@ export default function ConfirmPaymentPage() {
       await checkoutApi.resendCode(orderId)
 
       updateCooldown(RESEND_COOLDOWN_SECONDS)
-      setNotice('ახალი კოდი გაგზავნილია ელფოსტაზე.')
+      setNotice(i18n.t("auto.158"))
       setCode('')
     } catch (err: unknown) {
       if (
@@ -203,8 +207,8 @@ export default function ConfirmPaymentPage() {
     return (
       <main className="checkout-page">
         <div className="checkout-wrap checkout-state">
-          <p>შეკვეთის იდენტიფიკატორი ვერ მოიძებნა.</p>
-          <Link to="/cart">კალათაში დაბრუნება</Link>
+          <p><LocalizedText k="auto.159" /></p>
+          <Link to="/cart"><LocalizedText k="auto.160" /></Link>
         </div>
       </main>
     )
@@ -217,8 +221,7 @@ export default function ConfirmPaymentPage() {
           to="/checkout"
           className="checkout-back"
         >
-          ← ჩექაუთზე დაბრუნება
-        </Link>
+          <LocalizedText k="auto.161" /> </Link>
 
         <section className="checkout-panel checkout-confirm">
           <span
@@ -232,20 +235,19 @@ export default function ConfirmPaymentPage() {
             ATELIER · PAYMENT VERIFICATION
           </p>
 
-          <h1>დაადასტურე გადახდა</h1>
+          <h1><LocalizedText k="auto.162" /></h1>
 
           <p>
-            დადასტურების კოდი გამოგზავნილია{' '}
+            <LocalizedText k="auto.163" />{' '}
             {user?.email ? (
               <strong>{user.email}</strong>
             ) : (
-              'შენს ელფოსტაზე'
+              i18n.t("auto.164")
             )}
-            . კოდი მოქმედებს 10 წუთი.
-          </p>
+            <LocalizedText k="auto.165" /> </p>
 
           <p className="checkout-hint">
-            შეკვეთა: {orderId}
+            <LocalizedText k="auto.166" /> {orderId}
           </p>
 
           {notice && (
@@ -276,8 +278,7 @@ export default function ConfirmPaymentPage() {
 
               {stock.length > 0 && (
                 <Link to="/cart">
-                  კალათაში დაბრუნება →
-                </Link>
+                  <LocalizedText k="auto.167" /> </Link>
               )}
             </div>
           )}
@@ -290,8 +291,7 @@ export default function ConfirmPaymentPage() {
           >
             <div className="checkout-field">
               <label htmlFor="paymentCode">
-                ელფოსტით მიღებული კოდი
-              </label>
+                <LocalizedText k="auto.168" /> </label>
 
               <input
                 id="paymentCode"
@@ -304,7 +304,7 @@ export default function ConfirmPaymentPage() {
                   setCode(event.target.value.trim())
                 }}
                 aria-invalid={Boolean(error)}
-                placeholder="შეიყვანე კოდი"
+                placeholder={i18n.t("auto.169")}
                 required
               />
             </div>
@@ -319,8 +319,8 @@ export default function ConfirmPaymentPage() {
               }
             >
               {confirming
-                ? 'მოწმდება...'
-                : 'გადახდის დადასტურება'}
+                ? i18n.t("auto.170")
+                : i18n.t("auto.171")}
             </button>
           </form>
 
@@ -337,17 +337,14 @@ export default function ConfirmPaymentPage() {
             }}
           >
             {resending
-              ? 'იგზავნება...'
+              ? i18n.t("auto.172")
               : cooldown > 0
-                ? `ხელახლა გაგზავნა (${cooldown} წმ)`
-                : 'ახალი კოდის მოთხოვნა'}
+                ? i18n.t("fix.resend", { seconds: cooldown })
+                : i18n.t("auto.173")}
           </button>
 
           <p className="checkout-hint">
-            სატესტო კოდი ნახე DevTools → Network →
-            POST /orders პასუხში (devCode).
-            ის ავტომატურად არ შეივსება.
-          </p>
+            <LocalizedText k="auto.174" /> </p>
         </section>
       </div>
     </main>

@@ -1,3 +1,4 @@
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -25,6 +26,7 @@ const brands = [
 const imageBase = '/images/home/'
 
 function Header() {
+  useAtelierTranslation()
   const { t, i18n } = useTranslation()
   const { status, logout } = useAuth()
   const { cart, isLoading: isCartLoading } = useCart()
@@ -33,10 +35,10 @@ function Header() {
 
   return (
     <header className="home-header">
-      <Link className="home-brand" to="/home" aria-label="ATELIER — მთავარი გვერდი">
+      <Link className="home-brand" to="/home" aria-label={i18n.t("auto.060")}>
         ATELIER
       </Link>
-      <nav className="home-navigation" aria-label="მთავარი მენიუ">
+      <nav className="home-navigation" aria-label={i18n.t("auto.061")}>
         <Link className="home-nav-button" to="/catalog">
           <Grid2X2 size={19} strokeWidth={1.8} aria-hidden="true" />
           {t('catalog')}
@@ -45,8 +47,8 @@ function Header() {
           type="button"
           className="home-nav-button"
           disabled
-          title="სურვილების სია მოგვიანებით დაემატება"
-          aria-label="სურვილების სია — მოგვიანებით"
+          title={i18n.t("auto.062")}
+          aria-label={i18n.t("auto.063")}
         >
           <Heart size={19} strokeWidth={1.8} aria-hidden="true" />
           {t("wishlist")}
@@ -54,7 +56,7 @@ function Header() {
         <Link
           to="/cart"
           className="home-nav-button"
-          aria-label={isCartLoading ? 'კალათა იტვირთება' : `კალათა — ${cartQuantity} პროდუქტი`}
+          aria-label={isCartLoading ? i18n.t("auto.064") : `კალათა — ${cartQuantity} პროდუქტი`}
         >
           <ShoppingBag size={19} strokeWidth={1.8} aria-hidden="true" />
           {t("cart")}
@@ -86,6 +88,7 @@ function Header() {
 }
 
 export default function HomePage() {
+  useAtelierTranslation()
   const { i18n } = useTranslation()
   return (
     <main className="home-page">
@@ -93,10 +96,10 @@ export default function HomePage() {
         <Header />
       </div>
 
-      <section className="home-hero" aria-label="ATELIER-ის ინტერიერის კოლექცია">
+      <section className="home-hero" aria-label={i18n.t("auto.065")}>
         <img
           src={`${imageBase}hero.webp`}
-          alt="მუქი, თანამედროვე მისაღები ოთახი ბუხრით, დივნითა და მრგვალი მაგიდით"
+          alt={i18n.t("auto.066")}
           width={1916}
           height={821}
           fetchPriority="high"
@@ -104,7 +107,7 @@ export default function HomePage() {
       </section>
 
       <div className="home-container home-sections">
-        <section className="home-collection" aria-label="ბრენდები">
+        <section className="home-collection" aria-label={i18n.t("auto.067")}>
           <div className="home-cards home-cards--brands">
             {brands.map((brand) => (
               <Link
@@ -123,14 +126,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="home-collection" aria-label="კატეგორიები">
+        <section className="home-collection" aria-label={i18n.t("auto.068")}>
           <div className="home-cards home-cards--categories">
             {furnitureCategories.map((category) => (
               <Link
                 key={category.name}
                 className="home-category-card"
                 to={categoryCatalogUrl(category.query)}
-                aria-label={`${category.name} — პროდუქტების ნახვა`}
+                aria-label={`${i18n.language === 'en' ? category.en : category.name} — ${i18n.language === 'en' ? 'View products' : 'პროდუქტების ნახვა'}`}
               >
                 <img
                   src={`${imageBase}icons/${category.icon}`}

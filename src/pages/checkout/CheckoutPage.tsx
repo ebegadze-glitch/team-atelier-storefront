@@ -1,3 +1,6 @@
+import i18n from '../../shared/i18n/index'
+import LocalizedText from '../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -41,6 +44,7 @@ const backendFields = [
 ] as const
 
 function CheckoutPage() {
+  useAtelierTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
   const draftKey = `atelier-checkout-shipping-${user?.id ?? 'guest'}`
@@ -149,7 +153,7 @@ function CheckoutPage() {
           }
           if (first) {
             setFocus(first)
-            setPageError('შეამოწმე მონიშნული ველები.')
+            setPageError(i18n.t("auto.133"))
             return
           }
         }
@@ -164,17 +168,17 @@ function CheckoutPage() {
   }
 
   if (loading) {
-    return <main className="checkout-page"><div className="checkout-wrap" role="status">შეკვეთის მონაცემები იტვირთება...</div></main>
+    return <main className="checkout-page"><div className="checkout-wrap" role="status"><LocalizedText k="auto.134" /></div></main>
   }
 
   if (!preview) {
     return (
       <main className="checkout-page">
         <div className="checkout-wrap checkout-state">
-          <h1>ჩექაუთი ვერ ჩაიტვირთა</h1>
+          <h1><LocalizedText k="auto.135" /></h1>
           <p role="alert">{pageError}</p>
-          <button type="button" onClick={() => window.location.reload()}>ხელახლა ცდა</button>
-          <Link to="/cart">← კალათაში დაბრუნება</Link>
+          <button type="button" onClick={() => window.location.reload()}><LocalizedText k="auto.083" /></button>
+          <Link to="/cart"><LocalizedText k="auto.136" /></Link>
         </div>
       </main>
     )
@@ -188,74 +192,74 @@ function CheckoutPage() {
   return (
     <main className="checkout-page">
       <div className="checkout-wrap">
-        <nav className="checkout-breadcrumb"><Link to="/cart">← კალათაში დაბრუნება</Link><span>ATELIER / CHECKOUT</span></nav>
-        <header className="checkout-heading"><p>SECURE CHECKOUT</p><h1>შეკვეთის გაფორმება</h1><span>მიწოდება და სატესტო გადახდა ერთ გვერდზე</span></header>
+        <nav className="checkout-breadcrumb"><Link to="/cart"><LocalizedText k="auto.136" /></Link><span><LocalizedText k="checkout.breadcrumb" /></span></nav>
+        <header className="checkout-heading"><p><LocalizedText k="checkout.secure" /></p><h1><LocalizedText k="auto.137" /></h1><span><LocalizedText k="auto.138" /></span></header>
 
         <form className="checkout-layout" noValidate onSubmit={(event) => { void handleSubmit(submitOrder)(event) }}>
           <div className="checkout-form-stack">
             {pageError && <div role="alert" className="checkout-error">
               <strong>{pageError}</strong>
               {stockItems.length > 0 && <ul>{stockItems.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>}
-              {stockItems.length > 0 && <Link to="/cart">შეამოწმე კალათა →</Link>}
+              {stockItems.length > 0 && <Link to="/cart"><LocalizedText k="auto.139" /></Link>}
             </div>}
 
             <section className="checkout-panel" aria-labelledby="checkout-shipping-title">
-              <div className="checkout-section-label"><span>01</span><h2 id="checkout-shipping-title">მიწოდების ინფორმაცია</h2></div>
+              <div className="checkout-section-label"><span>01</span><h2 id="checkout-shipping-title"><LocalizedText k="auto.140" /></h2></div>
               {(preview.addresses?.length ?? 0) > 0 && (
                 <div className="checkout-field">
-                  <label htmlFor="savedAddress">შენახული მისამართები</label>
+                  <label htmlFor="savedAddress"><LocalizedText k="auto.141" /></label>
                   <select id="savedAddress" value={selectedAddressId} onChange={(event) => selectAddress(event.target.value)}>
-                    <option value="">მიმდინარე მონაცემები / ხელით შეყვანა</option>
+                    <option value=""><LocalizedText k="auto.142" /></option>
                     {preview.addresses?.map((address) => (
-                      <option key={address.id} value={address.id}>{address.label ?? address.city}{address.isDefault ? ' (ნაგულისხმევი)' : ''}</option>
+                      <option key={address.id} value={address.id}>{address.label ?? address.city}{address.isDefault ? i18n.t("auto.143") : ''}</option>
                     ))}
                   </select>
                 </div>
               )}
               <div className="checkout-fields-two">
                 <div className="checkout-field">
-                  <label htmlFor="shippingName">სახელი და გვარი</label>
+                  <label htmlFor="shippingName"><LocalizedText k="auto.144" /></label>
                   <input id="shippingName" autoComplete="name" aria-invalid={Boolean(errors.shipping?.fullName)} aria-describedby={errors.shipping?.fullName ? 'shippingNameError' : undefined} {...register('shipping.fullName')} />
                   {errors.shipping?.fullName && <small role="alert" id="shippingNameError">{errors.shipping.fullName.message}</small>}
                 </div>
                 <div className="checkout-field">
-                  <label htmlFor="shippingPhone">ტელეფონი</label>
+                  <label htmlFor="shippingPhone"><LocalizedText k="auto.028" /></label>
                   <input id="shippingPhone" type="tel" autoComplete="tel" placeholder="+995 555 12 34 56" aria-invalid={Boolean(errors.shipping?.phone)} {...register('shipping.phone')} />
                   {errors.shipping?.phone && <small role="alert">{errors.shipping.phone.message}</small>}
                 </div>
                 <div className="checkout-field">
-                  <label htmlFor="shippingCity">ქალაქი</label>
+                  <label htmlFor="shippingCity"><LocalizedText k="auto.029" /></label>
                   <input id="shippingCity" autoComplete="address-level2" aria-invalid={Boolean(errors.shipping?.city)} {...register('shipping.city')} />
                   {errors.shipping?.city && <small role="alert">{errors.shipping.city.message}</small>}
                 </div>
                 <div className="checkout-field">
-                  <label htmlFor="shippingAddress">მისამართი</label>
+                  <label htmlFor="shippingAddress"><LocalizedText k="auto.016" /></label>
                   <input id="shippingAddress" autoComplete="street-address" aria-invalid={Boolean(errors.shipping?.address)} {...register('shipping.address')} />
                   {errors.shipping?.address && <small role="alert">{errors.shipping.address.message}</small>}
                 </div>
               </div>
-              <p className="checkout-hint">ამ გვერდზე შესწორებული მისამართი მხოლოდ ამ შეკვეთას შეეხება.</p>
+              <p className="checkout-hint"><LocalizedText k="auto.145" /></p>
             </section>
 
             <section className="checkout-panel" aria-labelledby="checkout-payment-title">
-              <div className="checkout-section-label"><span>02</span><h2 id="checkout-payment-title">სატესტო ბარათი</h2></div>
-              <p className="checkout-hint">ეს სასწავლო გადახდაა — რეალური თანხა არ ჩამოიჭრება.</p>
+              <div className="checkout-section-label"><span>02</span><h2 id="checkout-payment-title"><LocalizedText k="auto.146" /></h2></div>
+              <p className="checkout-hint"><LocalizedText k="auto.147" /></p>
               {paymentError && <div className="checkout-error" role="alert">{paymentError}</div>}
               <div className="checkout-field">
-                <label htmlFor="cardNumber">ბარათის ნომერი</label>
+                <label htmlFor="cardNumber"><LocalizedText k="auto.148" /></label>
                 <Controller name="card.number" control={control} render={({ field }) => (
                   <input {...field} id="cardNumber" inputMode="numeric" autoComplete="cc-number" placeholder="4242 4242 4242 4242" maxLength={23} aria-invalid={Boolean(errors.card?.number)} onChange={(event) => field.onChange(formatCardNumber(event.target.value))} />
                 )} />
                 {errors.card?.number && <small role="alert">{errors.card.number.message}</small>}
               </div>
               <div className="checkout-field">
-                <label htmlFor="cardHolder">ბარათის მფლობელი</label>
+                <label htmlFor="cardHolder"><LocalizedText k="auto.149" /></label>
                 <input id="cardHolder" autoComplete="cc-name" placeholder="NAME SURNAME" aria-invalid={Boolean(errors.card?.holder)} {...register('card.holder')} />
                 {errors.card?.holder && <small role="alert">{errors.card.holder.message}</small>}
               </div>
               <div className="checkout-fields-two">
                 <div className="checkout-field">
-                  <label htmlFor="cardExpiry">ვადა (MM/YY)</label>
+                  <label htmlFor="cardExpiry"><LocalizedText k="auto.150" /></label>
                   <Controller name="card.expiry" control={control} render={({ field }) => (
                     <input {...field} id="cardExpiry" inputMode="numeric" autoComplete="cc-exp" placeholder="12/29" maxLength={5} aria-invalid={Boolean(errors.card?.expiry)} onChange={(event) => field.onChange(formatExpiry(event.target.value))} />
                   )} />
@@ -273,22 +277,22 @@ function CheckoutPage() {
           </div>
 
           <aside className="checkout-panel checkout-summary" aria-labelledby="checkout-total-title">
-            <h2 id="checkout-total-title">შეკვეთის შეჯამება</h2>
+            <h2 id="checkout-total-title"><LocalizedText k="auto.099" /></h2>
             <div className="checkout-items">
               {preview.items.map((item) => <div className="checkout-item" key={item.id}>
                 {item.product.image ? <img src={item.product.image} alt="" /> : <div className="checkout-item-fallback" aria-hidden="true" />}
-                <div><strong>{item.product.title}</strong><span>რაოდ.: {item.qty}</span></div>
+                <div><strong>{item.product.title}</strong><span><LocalizedText k="auto.151" /> {item.qty}</span></div>
                 <b>{money(item.lineTotal, currency)}</b>
               </div>)}
             </div>
-            <div className="checkout-money-row"><span>პროდუქტები</span><strong>{money(preview.subtotal, currency)}</strong></div>
-            <div className="checkout-money-row"><span>მიწოდება</span><strong>{preview.shippingFee === 0 ? 'უფასო' : money(preview.shippingFee, currency)}</strong></div>
-            {remaining > 0 && <p className="checkout-shipping-tip">კიდევ {money(remaining, currency)} და მიწოდება უფასოა.</p>}
-            <div className="checkout-money-row checkout-money-total"><span>სულ</span><strong>{money(preview.total, currency)}</strong></div>
+            <div className="checkout-money-row"><span><LocalizedText k="auto.090" /></span><strong>{money(preview.subtotal, currency)}</strong></div>
+            <div className="checkout-money-row"><span><LocalizedText k="auto.152" /></span><strong>{preview.shippingFee === 0 ? i18n.t("auto.153") : money(preview.shippingFee, currency)}</strong></div>
+            {remaining > 0 && <p className="checkout-shipping-tip"><LocalizedText k="auto.154" /> {money(remaining, currency)} <LocalizedText k="auto.155" /></p>}
+            <div className="checkout-money-row checkout-money-total"><span><LocalizedText k="auto.102" /></span><strong>{money(preview.total, currency)}</strong></div>
             <button type="submit" className="checkout-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'მუშავდება...' : `გადახდა — ${money(preview.total, currency)}`}
+              {isSubmitting ? i18n.t("auto.156") : i18n.t("fix.pay", { amount: money(preview.total, currency) })}
             </button>
-            <p className="checkout-security">🔒 მონაცემები იგზავნება მხოლოდ სატესტო API-ში; ბარათი არ ინახება ბრაუზერში.</p>
+            <p className="checkout-security"><LocalizedText k="auto.157" /></p>
           </aside>
         </form>
       </div>

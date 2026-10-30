@@ -1,9 +1,10 @@
+import i18n from '../../../shared/i18n/index'
 import { isApiError } from '../../../shared/api/apiClient'
 
 /** Use API error codes, not untranslated server messages, in cart UI. */
 export function cartErrorText(
   error: unknown,
-  fallback = 'კალათის განახლება ვერ მოხერხდა.',
+  fallback = i18n.t("auto.034"),
 ): string {
   if (!isApiError(error)) {
     return fallback
@@ -11,26 +12,26 @@ export function cartErrorText(
 
   switch (error.code) {
     case 'OUT_OF_STOCK':
-      return 'პროდუქტი ამჟამად არ არის მარაგში.'
+      return i18n.t("auto.035")
 
     case 'INSUFFICIENT_STOCK':
       return typeof error.available === 'number'
         ? `მარაგში დარჩენილია მხოლოდ ${error.available} ცალი.`
-        : 'მოთხოვნილი რაოდენობა მარაგში არ არის.'
+        : i18n.t("auto.036")
 
     case 'CART_ITEM_NOT_FOUND':
-      return 'ეს პოზიცია კალათაში აღარ არის.'
+      return i18n.t("auto.037")
 
     case 'PRODUCT_NOT_FOUND':
-      return 'პროდუქტი აღარ არსებობს.'
+      return i18n.t("auto.038")
 
     case 'NETWORK_ERROR':
-      return 'ქსელთან დაკავშირება ვერ მოხერხდა.'
+      return i18n.t("auto.010")
 
     case 'TOKEN_EXPIRED':
     case 'INVALID_TOKEN':
     case 'UNAUTHORIZED':
-      return 'სესიის ვადა ამოიწურა. გთხოვ, შეხვიდე ხელახლა.'
+      return i18n.t("auto.039")
 
     default:
       return fallback

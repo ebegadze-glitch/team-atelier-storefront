@@ -1,3 +1,6 @@
+import i18n from '../../shared/i18n/index'
+import LocalizedText from '../../shared/i18n/LocalizedText'
+import { useTranslation as useAtelierTranslation } from 'react-i18next'
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -20,6 +23,7 @@ function formatPrice(
 }
 
 export default function CartPage() {
+  useAtelierTranslation()
   const {
     cart,
     isLoading,
@@ -97,28 +101,24 @@ export default function CartPage() {
       <div className="cart-container">
         <nav
           className="cart-navigation"
-          aria-label="კალათის ნავიგაცია"
+          aria-label={i18n.t("auto.078")}
         >
           <Link to="/home">
-            ← მთავარი გვერდი
-          </Link>
+            <LocalizedText k="auto.079" /> </Link>
 
           <Link to="/catalog">
-            კატალოგი →
-          </Link>
+            <LocalizedText k="auto.080" /> </Link>
         </nav>
 
         <header className="cart-header">
           <p className="cart-eyebrow">
-            ATELIER / SHOPPING CART
+            <LocalizedText k="cart.breadcrumb" />
           </p>
 
-          <h1>ჩემი კალათა</h1>
+          <h1><LocalizedText k="auto.081" /></h1>
 
           <p className="cart-subtitle">
-            შეამოწმე არჩეული პროდუქტები,
-            რაოდენობა და ჯამური ღირებულება.
-          </p>
+            <LocalizedText k="auto.082" /> </p>
         </header>
 
         {error && (
@@ -132,8 +132,7 @@ export default function CartPage() {
               }}
               disabled={isLoading || isMutating}
             >
-              ხელახლა ცდა
-            </button>
+              <LocalizedText k="auto.083" /> </button>
           </div>
         )}
 
@@ -157,11 +156,10 @@ export default function CartPage() {
               aria-hidden="true"
             />
 
-            <h2>კალათა იტვირთება...</h2>
+            <h2><LocalizedText k="auto.084" /></h2>
 
             <p>
-              გთხოვ, დაელოდე მონაცემების ჩატვირთვას.
-            </p>
+              <LocalizedText k="auto.085" /> </p>
           </div>
         ) : !hasItems ? (
           <div className="cart-state">
@@ -172,32 +170,28 @@ export default function CartPage() {
               <ShoppingBag size={48} strokeWidth={1.8} />
             </span>
 
-            <h2>კალათა ცარიელია</h2>
+            <h2><LocalizedText k="auto.086" /></h2>
 
             <p>
-              კატალოგში აირჩიე სასურველი
-              პროდუქტები და დაამატე კალათაში.
-            </p>
+              <LocalizedText k="auto.087" /> </p>
 
             <Link
               className="cart-primary-link"
               to="/catalog"
             >
-              პროდუქტების ნახვა →
-            </Link>
+              <LocalizedText k="auto.088" /> </Link>
           </div>
         ) : (
           <div className="cart-layout">
             <section
               className="cart-items-section"
-              aria-label="არჩეული პროდუქტები"
+              aria-label={i18n.t("auto.089")}
             >
               <div className="cart-section-heading">
-                <h2>პროდუქტები</h2>
+                <h2><LocalizedText k="auto.090" /></h2>
 
                 <span>
-                  {cart?.totalQty ?? 0} ერთეული
-                </span>
+                  {i18n.t("fix.cartCount", { count: cart?.totalQty ?? 0 })} </span>
               </div>
 
               <div className="cart-items">
@@ -236,8 +230,7 @@ export default function CartPage() {
                             className="cart-image-placeholder"
                             aria-hidden="true"
                           >
-                            ფოტო არ არის
-                          </span>
+                            <LocalizedText k="auto.092" /> </span>
                         )}
                       </Link>
 
@@ -259,12 +252,11 @@ export default function CartPage() {
                               void handleRemove(item.id)
                             }}
                           >
-                            წაშლა
-                          </button>
+                            <LocalizedText k="auto.024" /> </button>
                         </div>
 
                         <p className="cart-unit-price">
-                          ერთეულის ფასი:{' '}
+                          <LocalizedText k="auto.093" />{' '}
                           {formatPrice(
                             item.product.price,
                             currency,
@@ -279,10 +271,10 @@ export default function CartPage() {
                           }
                         >
                           {item.product.inStock === false
-                            ? 'ამჟამად არ არის მარაგში'
+                            ? i18n.t("auto.094")
                             : typeof stock === 'number'
-                              ? `ხელმისაწვდომია: ${stock} ერთეული`
-                              : 'პროდუქტის მარაგი მოწმდება სერვერზე'}
+                              ? i18n.t("fix.available", { count: stock })
+                              : i18n.t("auto.095")}
                         </p>
 
                         <div className="cart-item-bottom">
@@ -305,7 +297,7 @@ export default function CartPage() {
                             </button>
 
                             <output
-                              aria-label="მიმდინარე რაოდენობა"
+                              aria-label={i18n.t("auto.096")}
                             >
                               {item.qty}
                             </output>
@@ -337,9 +329,7 @@ export default function CartPage() {
                           item.qty >= stock &&
                           item.product.inStock !== false && (
                             <p className="cart-stock-limit">
-                              მიღწეულია ხელმისაწვდომი
-                              მარაგის ზღვარი.
-                            </p>
+                              <LocalizedText k="auto.097" /> </p>
                           )}
                       </div>
                     </article>
@@ -351,8 +341,7 @@ export default function CartPage() {
                 to="/catalog"
                 className="cart-continue-link"
               >
-                ← შოპინგის გაგრძელება
-              </Link>
+                <LocalizedText k="auto.098" /> </Link>
             </section>
 
             <aside
@@ -360,11 +349,10 @@ export default function CartPage() {
               aria-labelledby="cart-summary-title"
             >
               <h2 id="cart-summary-title">
-                შეკვეთის შეჯამება
-              </h2>
+                <LocalizedText k="auto.099" /> </h2>
 
               <div className="cart-summary-row">
-                <span>პროდუქტების რაოდენობა</span>
+                <span><LocalizedText k="auto.100" /></span>
 
                 <strong>
                   {cart?.totalQty ?? 0}
@@ -372,7 +360,7 @@ export default function CartPage() {
               </div>
 
               <div className="cart-summary-row">
-                <span>პროდუქტების ღირებულება</span>
+                <span><LocalizedText k="auto.101" /></span>
 
                 <strong>
                   {formatPrice(
@@ -388,7 +376,7 @@ export default function CartPage() {
                 className="cart-summary-total"
                 aria-live="polite"
               >
-                <span>სულ</span>
+                <span><LocalizedText k="auto.102" /></span>
 
                 <strong>
                   {formatPrice(
@@ -399,25 +387,21 @@ export default function CartPage() {
               </div>
 
               <p className="cart-summary-note">
-                თანხა და რაოდენობა მიღებულია
-                სერვერიდან. გადახდა სატესტოა — თანხა არ ჩამოგეჭრება.
-              </p>
+                <LocalizedText k="auto.103" /> </p>
 
               {isMutating && (
                 <p
                   className="cart-saving"
                   role="status"
                 >
-                  ცვლილებები ინახება...
-                </p>
+                  <LocalizedText k="auto.104" /> </p>
               )}
 
               <Link
                 className="cart-primary-link cart-summary-continue"
                 to="/checkout"
               >
-                შეკვეთის გაფორმება →
-              </Link>
+                <LocalizedText k="auto.105" /> </Link>
             </aside>
           </div>
         )}
