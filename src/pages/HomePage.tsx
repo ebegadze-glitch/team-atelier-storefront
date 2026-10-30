@@ -1,3 +1,4 @@
+import ThemeToggle from '../shared/theme/ThemeToggle'
 import { useTranslation as useAtelierTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -81,7 +82,10 @@ function Header() {
             {t("login")}
           </Link>
         )}
-        <button type="button" className="home-nav-button" onClick={() => { const next = i18n.language === "en" ? "ka" : "en"; localStorage.setItem("atelier-language", next); void i18n.changeLanguage(next) }}>{i18n.language === "en" ? "EN / KA" : "KA / EN"}</button>
+        <div className="home-display-controls">
+          <button type="button" className="home-nav-button" onClick={() => { const next = i18n.language === "en" ? "ka" : "en"; localStorage.setItem("atelier-language", next); void i18n.changeLanguage(next) }}>{i18n.language === "en" ? "EN / KA" : "KA / EN"}</button>
+          <ThemeToggle />
+        </div>
       </nav>
     </header>
   )
@@ -99,6 +103,8 @@ export default function HomePage() {
       <section className="home-hero" aria-label={i18n.t("auto.065")}>
         <img
           src={`${imageBase}hero.webp`}
+          srcSet={`${imageBase}hero-960.webp 960w, ${imageBase}hero-1280.webp 1280w, ${imageBase}hero.webp 1916w`}
+          sizes="100vw"
           alt={i18n.t("auto.066")}
           width={1916}
           height={821}

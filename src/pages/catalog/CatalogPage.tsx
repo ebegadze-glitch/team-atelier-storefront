@@ -893,11 +893,11 @@ export default function CatalogPage() {
 
 
 
-{!selectedFurniture && category?.description ? (
+{!selectedFurniture && (
   <p className="catalog-description">
-    {localizedCatalogText(category.description)}
+    {category?.description ? localizedCatalogText(category.description) : '\u00a0'}
   </p>
-) : null}
+)}
 
 
         </header>
@@ -964,9 +964,18 @@ export default function CatalogPage() {
               </p>
             )}
 
-            {category?.filters.map(
-              renderFilter,
-            )}
+            {category ? (
+              category.filters.map(renderFilter)
+            ) : !categoryError ? (
+              <div className="catalog-filters-loading" aria-hidden="true">
+                {Array.from({ length: 4 }, (_, index) => (
+                  <div className="catalog-filter-placeholder" key={index}>
+                    <div className="catalog-filter-placeholder-title" />
+                    <div className="catalog-filter-placeholder-lines" />
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </aside>
 
           {/* PRODUCTS */}

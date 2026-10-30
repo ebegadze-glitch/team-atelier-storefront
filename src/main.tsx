@@ -26,4 +26,5 @@ createRoot(rootElement).render(
     </AuthProvider>
   </StrictMode>,
 )
- 
+
+import './shared/theme/darkMode.css'

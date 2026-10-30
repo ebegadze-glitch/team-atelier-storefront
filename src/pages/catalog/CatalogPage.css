@@ -910,3 +910,31 @@
     animation: none;
   }
 }
+/* FE-010: reserve catalogue space during asynchronous filter loading.
+   Scope deliberately limited to the catalogue page. */
+.catalog-description {
+  min-height: 3.2em;
+}
+.catalog-filters-loading {
+  display: grid;
+  gap: 16px;
+  padding: 16px 0;
+}
+.catalog-filter-placeholder {
+  display: grid;
+  gap: 12px;
+  min-height: 150px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+}
+.catalog-filter-placeholder-title {
+  width: 40%;
+  height: 16px;
+  border-radius: 5px;
+  background: rgba(128, 128, 128, 0.17);
+}
+.catalog-filter-placeholder-lines {
+  width: 75%;
+  height: 88px;
+  border-radius: 6px;
+  background: rgba(128, 128, 128, 0.10);
+}

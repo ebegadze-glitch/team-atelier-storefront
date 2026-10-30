@@ -1,3 +1,7 @@
+import { ThemeProvider } from './shared/theme/ThemeContext'
+import ThemeToggle from './shared/theme/ThemeToggle'
+import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
@@ -27,10 +31,32 @@ function PublicOnlyRoute({ children }: { children: ReactNode }) {
   return children
 }
 
+function OtherPagesThemeToggle() {
+  const location = useLocation()
+  const { i18n } = useTranslation()
+  if (location.pathname === '/home') return null
+  const isEnglish = i18n.language.toLowerCase().startsWith('en')
+  const switchLanguage = () => {
+    const next = isEnglish ? 'ka' : 'en'
+    localStorage.setItem('atelier-language', next)
+    void i18n.changeLanguage(next)
+  }
+  return (
+    <div className="atelier-page-controls" aria-label="Display settings">
+      <button type="button" className="atelier-language-toggle" onClick={switchLanguage} aria-label={isEnglish ? 'Switch to Georgian' : 'ინგლისურზე გადართვა'}>
+        {isEnglish ? 'EN / KA' : 'KA / EN'}
+      </button>
+      <ThemeToggle />
+    </div>
+  )
+}
+
 export default function App() {
   return (
+    <ThemeProvider>
     <BrowserRouter>
-      <Suspense fallback={<div role="status" aria-busy="true" />}>
+      <OtherPagesThemeToggle />
+      <Suspense fallback={<div role="status" aria-busy="true" aria-label="გვერდი იტვირთება" style={{ minHeight: '100svh' }} />}>
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
 
@@ -57,5 +83,6 @@ export default function App() {
       </Suspense>
       <SiteFooter />
     </BrowserRouter>
+    </ThemeProvider>
   )
 }
