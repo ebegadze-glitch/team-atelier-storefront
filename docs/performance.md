@@ -64,3 +64,14 @@ Visit each exact URL listed above and run Lighthouse **Mobile** with Performance
 ## Scope note
 
 The scores above are based on user-provided Lighthouse runs, not independently run by the author of this report. No source files or CSS are changed by this documentation package.
+
+## JavaScript bundle size — final measurement
+
+- Date: 2026-10-31
+- Source: production build (`dist/assets`)
+- JavaScript files: 22
+- Total JavaScript gzip size: **173.80 KB**
+- Required maximum: **less than 300 KB**
+- Result: **PASS**
+- Measurement: sum of gzip-compressed JavaScript files using Python.
+- Note: this is the total emitted JavaScript, not only the entry chunk.
