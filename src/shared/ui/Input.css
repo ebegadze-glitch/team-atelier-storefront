@@ -1,0 +1,28 @@
+.input {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-16);
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--background-page);
+  color: var(--text-primary);
+}
+
+.input:hover {
+  border-color: var(--text-secondary);
+}
+
+.input:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.input:disabled {
+  background: var(--disabled-bg);
+  color: var(--disabled-text);
+  cursor: not-allowed;
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--error-border);
+}

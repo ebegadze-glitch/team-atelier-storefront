@@ -1,0 +1,476 @@
+/* ATELIER Dark Mode — graphite, warm beige. All overrides are scoped to dark mode. */
+.atelier-theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 8px 14px; cursor: pointer;
+  border: 1px solid var(--atelier-border, #d6ccbe); border-radius: 12px;
+  background: var(--atelier-surface, #eae2d8); color: var(--atelier-ink, #101010);
+  font: inherit; font-size: 14px; font-weight: 650;
+}
+.atelier-theme-toggle:hover { filter: brightness(1.09); }
+.atelier-theme-toggle:focus-visible { outline: 3px solid var(--focus-ring, #9e886c); outline-offset: 3px; }
+.atelier-theme-toggle--floating {
+  position: static;
+  box-shadow: 0 4px 18px #0002;
+}
+
+
+html[data-theme='dark'] {
+  --atelier-ink: #f3eadf;
+  --atelier-page: #242321;
+  --atelier-surface: #3c3833;
+  --atelier-hover: #524a40;
+  --atelier-border: #71685a;
+  --background-page: #242321;
+  --background-subtle: #2d2a26;
+  --text-primary: #f3eadf;
+  --text-secondary: #d0c4b3;
+  --border-default: #71685a;
+  --border-subtle: #514b44;
+  --action-primary-bg: #d6c4ab;
+  --action-primary-bg-hover: #e2d2bc;
+  --action-primary-text: #242321;
+  --action-secondary-bg: #403b35;
+  --action-secondary-text: #f3eadf;
+  --focus-ring: #ead5b6;
+  --disabled-bg: #37332f;
+  --disabled-text: #aca296;
+  color-scheme: dark;
+}
+html[data-theme='dark'] body,
+html[data-theme='dark'] #root { background: #242321; color: #f3eadf; }
+html[data-theme='dark'] :is(.home-page, .catalog-page, .cart-page, .checkout-page, .product-details-page, .profile-page, .addresses-page, .login-page, .register-page, .forgot-password-page) {
+  background: #242321 !important; color: #f3eadf !important;
+}
+html[data-theme='dark'] .home-page { --home-black: #f3eadf; --home-bg: #242321; --home-beige: #403b35; }
+html[data-theme='dark'] :is(.home-page, .catalog-page, .cart-page, .checkout-page, .product-details-page, .profile-page, .addresses-page, .login-page, .register-page, .forgot-password-page)
+  :is(h1, h2, h3, h4, label, strong, p, span) { color: inherit; }
+html[data-theme='dark'] :is(.home-header, .home-collection, .home-navigation, .catalog-container, .cart-container, .checkout-wrap, .product-details-container, .profile-container, .addresses-container) { color: #f3eadf; }
+html[data-theme='dark'] :is(.home-header, .home-navigation) :is(a, button, span) { color: #f3eadf; }
+html[data-theme='dark'] .home-header { border-bottom-color: #514b44; }
+html[data-theme='dark'] :is(.atelier-site-footer, .catalog-sidebar, .catalog-filter-panel, .catalog-product-card, .catalog-card, .cart-item, .cart-summary, .checkout-panel, .checkout-summary, .checkout-section, .product-card, .related-product-card, .product-specifications, .product-specs, .profile-card, .profile-container, .address-card, .addresses-form-card, .login-card, .register-card, .forgot-password-card) {
+  background-color: #302d29 !important; color: #f3eadf !important; border-color: #60584c !important;
+}
+html[data-theme='dark'] .atelier-site-footer :is(a, span, small, strong, nav) { color: #f3eadf !important; }
+html[data-theme='dark'] :is(.home-nav-button, .atelier-theme-toggle, .catalog-top-link, .catalog-state button, .cart-navigation a, .cart-primary-link, .checkout-primary, .continue-shopping-button, .back-to-catalog-button, .add-to-cart-button, .button) {
+  background: #403b35 !important; border-color: #73695c !important; color: #f3eadf !important;
+}
+html[data-theme='dark'] :is(button, a):focus-visible { outline-color: #ead5b6; }
+html[data-theme='dark'] :is(input, select, textarea, .input, .form-field input, .catalog-search input, .catalog-sort select, .checkout-field input, .checkout-field select) {
+  background-color: #34312c !important; color: #f3eadf !important; border-color: #756b5d !important;
+}
+html[data-theme='dark'] :is(input,textarea)::placeholder { color: #b5aa9b; opacity: 1; }
+html[data-theme='dark'] :is(.catalog-page, .cart-page, .checkout-page, .product-details-page, .profile-page, .addresses-page)
+  :is(h1, h2, h3, label, strong) { color: #f3eadf; }
+html[data-theme='dark'] :is(.product-specifications, .product-specs, .product-specifications table, .product-specs table, .checkout-money-row, .cart-summary-row, .catalog-filter-group) {
+  border-color: #5e574c !important;
+}
+html[data-theme='dark'] :is(th, td, .product-specs dt, .product-specs dd, .spec-label, .spec-value) {
+  background-color: #302d29; color: #f3eadf; border-color: #514b44;
+}
+html[data-theme='dark'] :is(.login-subtitle, .register-subtitle, .forgot-password-subtitle, .catalog-subtitle, .cart-subtitle, .checkout-hint, .checkout-security, .product-description) { color: #d0c4b3 !important; }
+html[data-theme='dark'] :is(.discount-badge, .product-details-discount, .related-product-discount) { color: #fff !important; background: #201e1b; }
+html[data-theme='dark'] :is(.checkout-error, .cart-error, .add-to-cart-error) { color: #ff9e96 !important; }
+html[data-theme='dark'] img { filter: none; }
+
+/* Dark-mode contrast and surface corrections — do not affect Light Mode. */
+html[data-theme='dark'] {
+  --dark-surface: #302d29;
+  --dark-raised: #3c3833;
+  --dark-text: #f3eadf;
+  --dark-muted: #d0c4b3;
+  --dark-stroke: #71685a;
+  --dark-focus: #d9bea0;
+}
+/* Sticky catalog filter header must not remain white. */
+html[data-theme='dark'] .catalog-sidebar,
+html[data-theme='dark'] .filters-header,
+html[data-theme='dark'] .catalog-filter-panel,
+html[data-theme='dark'] .catalog-filter-group {
+  background: var(--dark-surface) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-stroke) !important;
+}
+html[data-theme='dark'] .filters-header :is(h2,button),
+html[data-theme='dark'] .clear-filters-button,
+html[data-theme='dark'] .filter-group :is(h3,label,span) {
+  color: var(--dark-text) !important;
+}
+html[data-theme='dark'] .clear-filters-button { background: transparent !important; }
+/* Empty cart and other state panels should use dark surfaces with readable text. */
+html[data-theme='dark'] .cart-state,
+html[data-theme='dark'] .catalog-state,
+html[data-theme='dark'] .addresses-empty {
+  background: var(--dark-surface) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-stroke) !important;
+}
+html[data-theme='dark'] .cart-state :is(h2,p,svg),
+html[data-theme='dark'] .catalog-state :is(h2,p,svg) {
+  color: var(--dark-text) !important;
+}
+html[data-theme='dark'] .cart-empty-icon { color: var(--dark-muted) !important; }
+html[data-theme='dark'] .cart-spinner { border-color: var(--dark-stroke); border-top-color: var(--dark-text); }
+/* Catalog pagination and other white control surfaces. */
+html[data-theme='dark'] .catalog-pagination :is(button,a),
+html[data-theme='dark'] .catalog-page :is(.pagination-button,.catalog-page-button),
+html[data-theme='dark'] .cart-state :is(button,a) {
+  background: var(--dark-raised) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-stroke) !important;
+}
+html[data-theme='dark'] :is(button,input,select,textarea,a):focus-visible {
+  outline: 2px solid var(--dark-focus) !important;
+  outline-offset: 2px;
+}
+html[data-theme='dark'] :is(input[type='checkbox'],input[type='radio'],input[type='range']) {
+  accent-color: #d6c4ab !important;
+}
+/* Browser-native select popup appearance follows OS/browser, but field colors match the theme. */
+html[data-theme='dark'] select { color-scheme: dark; }
+html[data-theme='dark'] option { color: #f3eadf; background: #302d29; }
+/* Address page must not preserve default blue and pale mint text. */
+html[data-theme='dark'] .addresses-back { color: #e5c9a6 !important; }
+html[data-theme='dark'] .address-default-badge {
+  background: #4a4237 !important;
+  color: #f7e4c9 !important;
+  border: 1px solid #907c63;
+}
+html[data-theme='dark'] .addresses-heading :is(h1,p),
+html[data-theme='dark'] .address-card-header h2,
+html[data-theme='dark'] .address-card-details :is(p,strong),
+html[data-theme='dark'] .addresses-form-card h2 {
+  color: var(--dark-text) !important;
+}
+/* Feedback states: readable on dark surfaces. */
+html[data-theme='dark'] .add-to-cart-success,
+html[data-theme='dark'] [role='status'].add-to-cart-success {
+  background: #494034 !important;
+  color: #fff !important;
+  border: 1px solid #9b8a74;
+}
+html[data-theme='dark'] .add-to-cart-error,
+html[data-theme='dark'] .cart-error,
+html[data-theme='dark'] .checkout-error {
+  background: #4b2b2a !important;
+  color: #ffd4cc !important;
+  border-color: #9e5c57 !important;
+}
+/* Keep dark-theme alerts readable when feedback uses white/light backgrounds. */
+html[data-theme='dark'] .cart-page .cart-error,
+html[data-theme='dark'] .addresses-page .addresses-error { color: #ffd4cc !important; }
+
+/* Graphite/beige controls; no green success or toggle accents. */
+html[data-theme='dark'] .atelier-theme-toggle,
+html[data-theme='dark'] .atelier-language-toggle {
+  background: #756553 !important;
+  border-color: #9b8a74 !important;
+  color: #fff !important;
+}
+html[data-theme='dark'] .atelier-theme-toggle:hover,
+html[data-theme='dark'] .atelier-language-toggle:hover { background: #887760 !important; }
+html[data-theme='dark'] .add-to-cart-success { background: #494034 !important; color: #fff !important; border-color: #9b8a74 !important; }
+/* Make the profile password field match the other graphite fields, including browser autofill. */
+html[data-theme='dark'] .profile-page input,
+html[data-theme='dark'] .profile-page input[type='password'],
+html[data-theme='dark'] .profile-page input:focus {
+  background-color: #34312c !important;
+  color: #f3eadf !important;
+  border-color: #756b5d !important;
+}
+html[data-theme='dark'] input:-webkit-autofill,
+html[data-theme='dark'] input:-webkit-autofill:hover,
+html[data-theme='dark'] input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f3eadf !important;
+  -webkit-box-shadow: 0 0 0 1000px #34312c inset !important;
+  caret-color: #f3eadf !important;
+}
+/* Unify catalog pagination rather than leaving pale browser-style buttons. */
+html[data-theme='dark'] .catalog-pagination button,
+html[data-theme='dark'] .catalog-pagination a {
+  background: #403b35 !important;
+  color: #f3eadf !important;
+  border-color: #71685a !important;
+}
+html[data-theme='dark'] .catalog-pagination button:disabled { opacity: .5; }
+
+/* ATELIER_WHITE_NAV_ICONS_V1 */
+/* Dark mode: all navigation / header / theme control outline icons are white. */
+html[data-theme='dark'] :is(
+  .home-header .home-nav-button,
+  .home-header .atelier-theme-toggle,
+  .atelier-floating-controls .atelier-theme-toggle,
+  .atelier-header-theme-stack .atelier-theme-toggle,
+  .catalog-top-link,
+  .cart-navigation a,
+  .checkout-back,
+  .addresses-back,
+  .profile-back
+) svg {
+  color: #fff !important;
+  stroke: #fff !important;
+  fill: none;
+  opacity: 1 !important;
+}
+html[data-theme='dark'] .home-header .home-nav-button:disabled svg {
+  color: #fff !important;
+  stroke: #fff !important;
+  opacity: 1 !important;
+}
+/* Avoid changing product pictures, logos, emoji, or icons inside native selects. */
+
+
+/* ATELIER_WHITE_BACK_LINKS_20261030 */
+/* Text-only return navigation: same white color on all dark pages. */
+html[data-theme="dark"] :is(
+  .profile-page, .addresses-page, .checkout-page, .cart-page,
+  .catalog-page, .product-details-page, .orders-page, .order-details-page
+) a:is([href="/"], [href="/home"], [href="/profile"], [href="/cart"], [href="/catalog"], [href^="/catalog?"]),
+html[data-theme="dark"] :is(
+  .profile-page, .addresses-page, .checkout-page, .cart-page,
+  .catalog-page, .product-details-page, .orders-page, .order-details-page
+) :is(.back-link, .back-to-home, .back-to-profile, .back-to-cart, .back-to-catalog, .profile-back, .checkout-back, .addresses-back) {
+  color: #fff !important;
+  opacity: 1 !important;
+  text-decoration-color: currentColor;
+}
+html[data-theme="dark"] :is(.back-link, .back-to-home, .back-to-profile, .back-to-cart, .back-to-catalog, .profile-back, .checkout-back, .addresses-back) :is(svg, span) {
+  color: #fff !important;
+  stroke: currentColor;
+  opacity: 1 !important;
+}
+html[data-theme="dark"] :is(.profile-page, .addresses-page, .checkout-page, .cart-page, .catalog-page, .product-details-page) a:is([href="/"], [href="/home"], [href="/profile"], [href="/cart"], [href="/catalog"], [href^="/catalog?"]):hover,
+html[data-theme="dark"] :is(.back-link, .back-to-home, .back-to-profile, .back-to-cart, .back-to-catalog, .profile-back, .checkout-back, .addresses-back):hover {
+  color: #fff !important;
+  text-decoration: underline;
+}
+
+/* Unified layout: controls participate in document flow, never overlay cart. */
+.atelier-page-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; padding: 14px clamp(16px,3vw,48px) 0; background: var(--atelier-page, #f7f7f5); }
+.atelier-page-controls > button { width: 132px; min-height: 44px; }
+.atelier-language-toggle { border: 1px solid #d6ccbe; border-radius: 12px; background: #eae2d8; color: #101010; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+.home-display-controls { display: flex; flex-direction: column; align-items: stretch; gap: 8px; flex: 0 0 130px; }
+.home-display-controls .home-nav-button, .home-display-controls .atelier-theme-toggle { width: 100%; min-width: 0; }
+html[data-theme='dark'] .atelier-page-controls { background: #242321; }
+html[data-theme='dark'] .atelier-theme-toggle { background: #756553 !important; border-color: #9b8a74 !important; color: #fff !important; }
+html[data-theme='dark'] :is(.atelier-theme-toggle,.atelier-language-toggle) svg { stroke: #fff !important; color: #fff !important; }
+/* Actual catalog pagination class (not catalog-pagination). */
+html[data-theme='dark'] .catalog-page .pagination-controls button { background: #756553 !important; color: #fff !important; border: 1px solid #9b8a74 !important; }
+html[data-theme='dark'] .catalog-page .pagination-controls button:hover:not(:disabled) { background: #887760 !important; }
+html[data-theme='dark'] .catalog-page .pagination-controls button:disabled { background: #51483e !important; color: #e3d9cf !important; opacity: .65; cursor: not-allowed; }
+/* Text remains readable inside the auth panel at narrower widths. */
+.login-page { min-width: 0; padding-inline: max(20px, 4vw); }
+.login-page .login-card { width: min(100%, var(--form-max-width, 630px)); min-width: 0; margin-inline: auto; box-sizing: border-box; }
+.login-page .login-title { max-width: 100%; overflow-wrap: anywhere; text-wrap: balance; }
+@media (max-width: 680px) { .atelier-page-controls { padding: 12px 16px 0; } .home-display-controls { flex-basis: 130px; } }
+
+/* ATELIER_DARK_DESIGN_SYSTEM_V3 — single final source of truth.
+   All action buttons use one DARK graphite-brown; controls remain dark surfaces.
+   This section supersedes older conflicting rules above; light theme untouched. */
+html[data-theme='dark'] {
+  --atelier-action-bg: #403b35;
+  --atelier-action-hover: #4b453e;
+  --atelier-action-border: #756b5f;
+  --atelier-action-text: #ffffff;
+  --atelier-control-bg: #302d29;
+}
+
+/* All actionable <button>s and link-buttons share one color and geometry. */
+html[data-theme='dark'] button:not(.home-cart-badge),
+html[data-theme='dark'] :is(
+  .home-nav-button, .catalog-top-link, .catalog-cart-link,
+  .cart-primary-link, .cart-continue-link, .checkout-primary,
+  .checkout-link-primary, .continue-shopping-button,
+  .back-to-catalog-button, .add-to-cart-button, .button,
+  .catalog-state a, .cart-state a
+) {
+  background: var(--atelier-action-bg) !important;
+  background-color: var(--atelier-action-bg) !important;
+  border: 1px solid var(--atelier-action-border) !important;
+  color: var(--atelier-action-text) !important;
+  border-radius: 12px !important;
+  min-height: 46px;
+  box-shadow: none !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+html[data-theme='dark'] button:not(:disabled):hover,
+html[data-theme='dark'] :is(.home-nav-button, .catalog-top-link, .catalog-cart-link, .cart-primary-link, .cart-continue-link, .checkout-primary, .checkout-link-primary, .continue-shopping-button, .back-to-catalog-button, .add-to-cart-button, .button):hover:not([aria-disabled='true']) {
+  background: var(--atelier-action-hover) !important;
+  background-color: var(--atelier-action-hover) !important;
+  color: #fff !important;
+}
+html[data-theme='dark'] button:disabled,
+html[data-theme='dark'] [aria-disabled='true'] { opacity: .52; cursor: not-allowed; }
+html[data-theme='dark'] :is(button,.home-nav-button,.catalog-top-link,.catalog-cart-link,.cart-primary-link,.add-to-cart-button) svg {
+  color: #fff !important; stroke: #fff !important;
+}
+html[data-theme='dark'] :is(button,.home-nav-button,.catalog-top-link,.catalog-cart-link,.cart-primary-link,.add-to-cart-button) span:not(.home-cart-badge) { color: #fff !important; }
+
+/* The home header has seven actual controls. Do not give each a huge fixed width.
+   A single row at normal desktop widths; wrap naturally on smaller screens. */
+@media (min-width: 1120px) {
+  html[data-theme='dark'] .home-header {
+    flex-wrap: nowrap;
+    gap: clamp(10px,1.4vw,24px);
+  }
+  html[data-theme='dark'] .home-header .home-navigation {
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: clamp(6px,.7vw,12px);
+    min-width: 0;
+  }
+}
+html[data-theme='dark'] .home-header .home-display-controls { display: contents !important; }
+html[data-theme='dark'] .home-header .home-navigation > .home-nav-button,
+html[data-theme='dark'] .home-header .home-display-controls > :is(.home-nav-button,.atelier-theme-toggle) {
+  flex: 0 1 auto !important;
+  width: auto !important;
+  min-width: 110px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 8px clamp(9px,1.1vw,17px) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+@media (max-width: 1119px) {
+  html[data-theme='dark'] .home-header .home-navigation { flex-wrap: wrap; }
+}
+@media (max-width: 560px) {
+  html[data-theme='dark'] .home-header .home-navigation > .home-nav-button,
+  html[data-theme='dark'] .home-header .home-display-controls > :is(.home-nav-button,.atelier-theme-toggle) {
+    flex: 1 1 130px !important; min-width: 0 !important;
+  }
+}
+
+/* Language/theme settings on all other pages occupy one horizontal line. */
+html[data-theme='dark'] .atelier-page-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding: 14px clamp(16px,3vw,48px) 0;
+  background: #242321 !important;
+}
+html[data-theme='dark'] .atelier-page-controls > :is(.atelier-language-toggle,.atelier-theme-toggle) {
+  width: 148px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  flex: 0 0 148px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 390px) {
+  html[data-theme='dark'] .atelier-page-controls > :is(.atelier-language-toggle,.atelier-theme-toggle) {
+    width: min(42vw,148px) !important; flex: 0 1 42vw !important;
+  }
+}
+
+/* Override legacy pagination and settings button tones with the SAME shade. */
+html[data-theme='dark'] :is(.atelier-language-toggle,.atelier-theme-toggle),
+html[data-theme='dark'] .catalog-page .pagination-controls button,
+html[data-theme='dark'] .catalog-pagination button,
+html[data-theme='dark'] .catalog-pagination a {
+  background: var(--atelier-action-bg) !important;
+  background-color: var(--atelier-action-bg) !important;
+  border-color: var(--atelier-action-border) !important;
+  color: #fff !important;
+}
+html[data-theme='dark'] .catalog-page .pagination-controls button:disabled { opacity: .52; }
+
+/* Form fields are NOT buttons. Give all dark forms consistent surfaces. */
+html[data-theme='dark'] :is(input:not([type='checkbox']):not([type='radio']),select,textarea) {
+  background: var(--atelier-control-bg) !important;
+  color: #f3eadf !important;
+  border-color: var(--atelier-action-border) !important;
+  border-radius: 12px;
+}
+html[data-theme='dark'] select { color-scheme: dark; }
+html[data-theme='dark'] select option { background: #302d29; color: #fff; }
+
+/* No darker rectangular login box: same background as the page. */
+html[data-theme='dark'] :is(.login-page,.register-page,.forgot-password-page) { background: #242321 !important; }
+html[data-theme='dark'] :is(.login-card,.register-card,.forgot-password-card) {
+  background: transparent !important; box-shadow: none !important;
+  border-color: transparent !important;
+}
+/* Only the category pictograms, not product photography. */
+html[data-theme='dark'] .home-category-icon {
+  filter: brightness(0) invert(1) !important; opacity: 1;
+}
+
+
+/* Light and dark shared header layout only; no changes to color. */
+/* The HOME language and theme controls were wrapping in a second vertical row.
+   display:contents makes both true siblings of the navigation buttons. */
+.home-header .home-display-controls { display: contents !important; }
+.home-header .home-navigation {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.home-header .home-navigation > .home-nav-button,
+.home-header .home-display-controls > :is(.home-nav-button,.atelier-theme-toggle) {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 105px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 8px 12px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap;
+}
+@media (min-width: 1100px) {
+  .home-header { flex-wrap: nowrap !important; }
+  .home-header .home-navigation { flex-wrap: nowrap !important; }
+  .home-header .home-navigation > .home-nav-button,
+  .home-header .home-display-controls > :is(.home-nav-button,.atelier-theme-toggle) { min-width: 0 !important; }
+}
+@media (max-width: 600px) {
+  .home-header .home-navigation > .home-nav-button,
+  .home-header .home-display-controls > :is(.home-nav-button,.atelier-theme-toggle) {
+    flex: 1 1 120px !important;
+  }
+}
+/* Other pages: KA/EN and theme should sit side by side, and never cover cart. */
+.atelier-page-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  background: transparent !important;
+  padding: 14px clamp(16px,3vw,48px) 0 !important;
+}
+.atelier-page-controls > :is(.atelier-language-toggle,.atelier-theme-toggle) {
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  width: 146px !important;
+  flex: 0 0 146px !important;
+}
+@media (max-width: 410px) {
+  .atelier-page-controls > :is(.atelier-language-toggle,.atelier-theme-toggle) {
+    width: min(43vw,146px) !important;
+    flex: 0 1 min(43vw,146px) !important;
+  }
+}
+/* Avoid making the favorites / disabled action appear enabled. */
+.home-nav-button:disabled { opacity: .5 !important; }
