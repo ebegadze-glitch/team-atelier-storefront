@@ -149,6 +149,8 @@ function ProductContent({ slug }: ProductContentProps) {
               {activeImage ? (
                 <img
                   src={activeImage}
+                  fetchPriority="high"
+                  loading="eager"
                   alt={`${product.title} — ფოტო ${Math.min(selectedImage + 1, images.length)} / ${images.length}`}
                 />
               ) : (
