@@ -60,7 +60,8 @@ The detailed LCP/CLS/TBT reports must be captured again after the current code c
 2. **Reserved loading height:** `Suspense` fallback has `minHeight: 100svh`, reducing initial footer movement.
 3. **Responsive home hero:** WebP `hero-960.webp`, `hero-1280.webp`, and original `hero.webp` are selected using `srcSet` / `sizes`; the image has `fetchPriority="high"`.
 4. **Catalog placeholders:** Reserved description/filter space reduces unexpected movement as API data arrives.
-5. **Product LCP image (review follow-up):** The main `ProductDetailsPage` image now specifies `fetchPriority="high"` and `loading="eager"`. This is a code fix; its effect on LCP **has not yet been measured**. Related images remain lazy-loaded.
+5. **API preconnect (review follow-up):** `index.html` now declares `rel="preconnect"` to `https://shop-api-kbe6.onrender.com`; connection benefit has not been measured and depends on the deployed API origin. 
+6. **Product LCP image (review follow-up):** The main `ProductDetailsPage` image now specifies `fetchPriority="high"` and `loading="eager"`. This is a code fix; its effect on LCP **has not yet been measured**. Related images remain lazy-loaded.
 
 External API product images are not claimed to have been resized, compressed, or delivered through a CDN. Recommendations and limitations are documented in [ADR 0007](adr/0007-fe010-api-images.md).
 
